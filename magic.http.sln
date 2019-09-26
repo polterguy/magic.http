@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{0080EF1F-A652-4498-BE59-F3FFFB3F33B2}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		.travis.yml = .travis.yml
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "magic.http.contracts", "magic.http.contracts\magic.http.contracts.csproj", "{B17AC2B3-03DD-4847-9A54-F2C3ABC7690B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "magic.http.services", "magic.http.services\magic.http.services.csproj", "{2454679F-43FA-4691-9E41-2EBCD0CA265B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "magic.http.tests", "magic.http.tests\magic.http.tests.csproj", "{AB49881B-0011-4F60-A03C-12665E17E943}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B17AC2B3-03DD-4847-9A54-F2C3ABC7690B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B17AC2B3-03DD-4847-9A54-F2C3ABC7690B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B17AC2B3-03DD-4847-9A54-F2C3ABC7690B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B17AC2B3-03DD-4847-9A54-F2C3ABC7690B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2454679F-43FA-4691-9E41-2EBCD0CA265B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2454679F-43FA-4691-9E41-2EBCD0CA265B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2454679F-43FA-4691-9E41-2EBCD0CA265B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2454679F-43FA-4691-9E41-2EBCD0CA265B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB49881B-0011-4F60-A03C-12665E17E943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB49881B-0011-4F60-A03C-12665E17E943}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB49881B-0011-4F60-A03C-12665E17E943}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB49881B-0011-4F60-A03C-12665E17E943}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7CA82191-A0E3-491A-884F-081431F97D97}
+	EndGlobalSection
+EndGlobal
