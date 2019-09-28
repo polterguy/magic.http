@@ -28,20 +28,22 @@ The library supports the 4 most commonly HTTP verbs, below is a list.
 The library provides 5 dead simple methods throughs its `IHttpClient`, which maps to the above HTTP verbs somehow.
 These methods should be fairly easily understood by most C# developers.
 
-* Task<Response> PostAsync<Request, Response>(string url, Request request, string contentType = "application/json", string token = null)
-* Task<Response> PutAsync<Request, Response>(string url, Request request, string contentType = "application/json", string token = null)
-* Task<Response> GetAsync<Response>(string url, string token = null)
-* Task GetAsync(string url, Action<Stream> functor, string token = null)
-* Task<Response> DeleteAsync<Response>(string url, string token = null)
+* PostAsync(url, request)
+* PutAsync(url, request)
+* GetAsync(url)
+* GetAsync(url, callback)
+* DeleteAsync(url)
 
 The `POST` and `PUT` verbs requires payload objects, that you provide as typed generic arguments, while the `DELETE` and `GET`
 verbs does not allow you to supply payloads. In addition you can optionally supply a _"token"_, normally a JWT token, that
-will be transmitted in the HTTP Authorize header of your request, as a _"Bearer"_ token. In addition the library will
-_"intelligently"_ handle both `Stream` requests and `Stream` responses for POST, PUT and GET (not DELETE), allowing you to
-either supply a `Stream` as a request object (PUT and POST), which will serialize your stream directly on to the HTTP request
-stream, or by using the overload of the `GetAsync` method that requires you to supply an `Action` taking one stream, from
-where you can directly access the HTTP response stream. This allows you to serialize large files, without first loading them
-into memory, both as request payloads and as response return values.
+will be transmitted in the HTTP Authorize header of your request, as a _"Bearer"_ token. You can also explicitly declare
+which type of `Content-Type` your PUT and POST requests are having as their payloads.
+
+In addition the library will _"intelligently"_ handle `Stream` requests for POST and PUT, allowing you to
+supply a `Stream` as a request object, which will serialize your stream directly on to the HTTP request
+stream, without loading its content into memory first. The `GetAsync` method also has an overload allowing
+you to access the response stream directly, allowing you to download large files, without first loading them
+into memory.
 
 Apart from the above features, the library does not really give you much options, and is to be considered an _"opinionated"_
 HTTP REST library, and its purpose is not to support every possible configuration you can imagine, since its purpose
@@ -63,14 +65,14 @@ for then to retrieve instances to its implementation using dependency injection 
 services.AddTransient<IHttpClient, HttpClient>();
 ```
 
-Most methods in its `HttpClient` implementation class is also virtual, allowing you to extend it, by inheriting from
-its base class, and override whatever method you simply must change for some reasons.
+Most methods in its `HttpClient` implementation class is also virtual, allowing you to extend the base `HttpClient`
+implementation, by inheriting from its base class, and override whatever method you simply must change for some reasons.
 
 However, the library is first and foremost created to support JSON and/or large files as payloads and response values,
 and the _"philosophy"_ of the library is to allow you to create HTTP REST requests with a _single line of code_, to
 such facilitate for simplified code, and great cohesion in your own code. The library will not support every single
-permutation of HTTP requests possible to create, due to that this would complicate its code, and result in that it over
-time degradates.
+permutation of HTTP requests possible to create, due to that this would complicate its code, and results in that it
+degradates over time.
 
 ## License
 
