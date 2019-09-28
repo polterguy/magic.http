@@ -102,13 +102,11 @@ namespace magic.http.services
         /// </summary>
         /// <param name="url">URL of your request.</param>
         /// <param name="functor">Action lambda function given the response Stream for you to do whatever you wish with once the request returns.</param>
-        /// <param name="accept">Optional Accept HTTP header declaration, allowing you to explicitly declare what type of MIME content you can handle.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Async void Task</returns>
         public async Task GetAsync(
             string url,
             Action<Stream> functor,
-            string accept = null,
             string token = null)
         {
             _logger.Info($"Invoking HTTP GET towards '{url}' with stream callback");
@@ -116,7 +114,6 @@ namespace magic.http.services
                 url,
                 net.HttpMethod.Get,
                 functor,
-                accept,
                 token);
         }
 
@@ -213,24 +210,18 @@ namespace magic.http.services
         /// <param name="method">HTTP method or verb to create your request as.</param>
         /// <param name="functor">Callback function that will be invoked with the response
         /// stream when it is ready.</param>
-        /// <param name="accept">HTTP Accept header for doing content negotiation with
-        /// the endpoint.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>An async Task</returns>
         virtual protected async Task CreateRequest(
             string url,
             net.HttpMethod method,
             Action<Stream> functor,
-            string accept,
             string token)
         {
             using(var msg = new net.HttpRequestMessage())
             {
                 msg.RequestUri = new Uri(url);
                 msg.Method = method;
-
-                if (accept != null)
-                    msg.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
 
                 if (token != null)
                     msg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);

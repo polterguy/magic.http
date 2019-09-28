@@ -44,7 +44,7 @@
             <param name="token">Optional Bearer token for your request.</param>
             <returns>Object returned from your request.</returns>
         </member>
-        <member name="M:magic.http.contracts.IHttpClient.GetAsync(System.String,System.Action{System.IO.Stream},System.String,System.String)">
+        <member name="M:magic.http.contracts.IHttpClient.GetAsync(System.String,System.Action{System.IO.Stream},System.String)">
             <summary>
             Gets a resource from some URL. Notice, this overload requires you to supply
             an Action taking a Stream as its input, from where you can directly access the response content,
@@ -52,7 +52,6 @@
             </summary>
             <param name="url">URL of your request.</param>
             <param name="functor">Action lambda function given the response Stream for you to do whatever you wish with once the request returns.</param>
-            <param name="accept">Optional Accept HTTP header declaration, allowing you to explicitly declare what type of MIME content you can handle.</param>
             <param name="token">Optional Bearer token for your request.</param>
             <returns>Async void Task</returns>
         </member>

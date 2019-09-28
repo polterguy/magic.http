@@ -62,17 +62,15 @@ namespace magic.http.contracts
         /// <summary>
         /// Gets a resource from some URL. Notice, this overload requires you to supply
         /// an Action taking a Stream as its input, from where you can directly access the response content,
-        /// without having to load it into memory. This i suseful for downloading larger documents from some URL.
+        /// without having to load it into memory. This is useful for downloading larger documents from some URL.
         /// </summary>
         /// <param name="url">URL of your request.</param>
         /// <param name="functor">Action lambda function given the response Stream for you to do whatever you wish with once the request returns.</param>
-        /// <param name="accept">Optional Accept HTTP header declaration, allowing you to explicitly declare what type of MIME content you can handle.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Async void Task</returns>
         Task GetAsync(
             string url,
             Action<Stream> functor,
-            string accept = null,
             string token = null);
 
         /// <summary>
