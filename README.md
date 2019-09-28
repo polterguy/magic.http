@@ -25,6 +25,14 @@ The library supports the 4 most commonly HTTP verbs, below is a list.
 * PUT
 * DELETE
 
+The library provides 5 dead simple methods throughs its `IHttpClient`, which maps to the above HTTP verbs somehow.
+
+* Task<Response> PostAsync<Request, Response>(string url, Request request, string contentType = "application/json", string token = null)
+* Task<Response> PutAsync<Request, Response>(string url, Request request, string contentType = "application/json", string token = null)
+* Task<Response> GetAsync<Response>(string url, string token = null)
+* Task GetAsync(string url, Action<Stream> functor, string token = null)
+* Task<Response> DeleteAsync<Response>(string url, string token = null)
+
 The `POST` and `PUT` verbs requires payload objects, that you provide as typed generic arguments, while the `DELETE` and `GET`
 verbs does not allow you to supply payloads. In addition you can optionally supply a _"token"_, normally a JWT token, that
 will be transmitted in the HTTP Authorize header of your request, as a _"Bearer"_ token. In addition the library will
