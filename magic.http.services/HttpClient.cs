@@ -33,11 +33,13 @@ namespace magic.http.services
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
+        /// <param name="contentType">Optional Content-Type for your request. Defaults to "application/json" if omitted.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
         public async Task<Response> PostAsync<Request, Response>(
             string url,
             Request request,
+            string contentType = "application/json",
             string token = null)
         {
             _logger.Info($"Invoking HTTP POST towards '{url}' with '{request}' as payload");
@@ -45,6 +47,7 @@ namespace magic.http.services
                 url,
                 net.HttpMethod.Post,
                 request,
+                contentType,
                 token);
         }
 
@@ -56,11 +59,13 @@ namespace magic.http.services
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
+        /// <param name="contentType">Optional Content-Type for your request. Defaults to "application/json" if omitted.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
         public async Task<Response> PutAsync<Request, Response>(
             string url,
             Request request,
+            string contentType = "application/json",
             string token = null)
         {
             _logger.Info($"Invoking HTTP PUT towards '{url}' with input '{request}'");
@@ -68,6 +73,7 @@ namespace magic.http.services
                 url,
                 net.HttpMethod.Put,
                 request,
+                contentType,
                 token);
         }
 
@@ -144,7 +150,7 @@ namespace magic.http.services
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="method">HTTP method or verb to create your request as.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
         virtual protected async Task<Response> CreateRequest<Response>(
             string url,
@@ -165,12 +171,14 @@ namespace magic.http.services
         /// <param name="url">URL of your request.</param>
         /// <param name="method">HTTP method or verb to create your request as.</param>
         /// <param name="input">Payload for your request.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="contentType">Content-Type for your request.</param>
+        /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
         virtual protected async Task<Response> CreateRequest<Response>(
             string url,
             net.HttpMethod method,
             object input,
+            string contentType,
             string token)
         {
             return await CreateRequestMessage(url, method, token, async (msg) =>
@@ -179,15 +187,17 @@ namespace magic.http.services
                 {
                     using (var content = new net.StreamContent(stream))
                     {
-                        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        if (contentType != null)
+                            content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
                         msg.Content = content;
                         return await GetResult<Response>(msg);
                     }
                 }
-                var stringContent = input is string ? (string)input : JObject.FromObject(input).ToString();
+                var stringContent = input is string strInput ? strInput : JObject.FromObject(input).ToString();
                 using (var content = new net.StringContent(stringContent))
                 {
-                    content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    if (contentType != null)
+                        content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
                     msg.Content = content;
                     return await GetResult<Response>(msg);
                 }
@@ -260,8 +270,6 @@ namespace magic.http.services
             {
                 msg.RequestUri = new Uri(url);
                 msg.Method = method;
-                msg.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                msg.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
 
                 if (token != null)
                     msg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);

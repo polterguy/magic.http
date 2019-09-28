@@ -15,7 +15,7 @@ The idea is that you provide your request type (if any), and your response type 
 HTTP REST invocations to a single line of code, resembling _"normal method invocations"_. This provides an
 extremely simply to use API, and also allows you to have large amount of cohesion where you consume the library.
 
-The library supports all 4 most commonly verbs, below is a list.
+The library supports the 4 most commonly HTTP dverbs, below is a list.
 
 * POST
 * GET
@@ -31,10 +31,13 @@ method that requires you to supply an `Action` taking one stream, from where you
 This allows you to serialize large files, without first loading them into memory, both as request payloads and as response
 return values.
 
+For stream HTTP responses you can override the `Accept` HTTP header
+
 Apart from the above features, the library does not really give you much options, and is to be considered an _"opinionated"_
 HTTP REST library, and its purpose is not to support every possible configuration you can imagine, since its purpose
-is first and foremost to be dead simple. However, if you have that _"one feature request you simply must have"_, feel free
-to supply a request in the [issues](https://github.com/polterguy/magic.http/issues).
+is first and foremost to be dead simple to use. However, if you have that _"one feature request you simply must have"_, feel free
+to supply a request in the [issues](https://github.com/polterguy/magic.http/issues). If it makes the API more complex,
+I might not want to support it though.
 
 ## Dependency injection
 

@@ -9,7 +9,7 @@
             Gives you easy one line of code access to invoke HTTP REST requests.
             </summary>
         </member>
-        <member name="M:magic.http.contracts.IHttpClient.PostAsync``2(System.String,``0,System.String)">
+        <member name="M:magic.http.contracts.IHttpClient.PostAsync``2(System.String,``0,System.String,System.String)">
             <summary>
             Posts an object asynchronously to the specified URL. Notice, you can supply a Stream as your request,
             and the service will intelligently determine it's a stream, and serialize it directly on to the HTTP request stream.
@@ -18,10 +18,11 @@
             <typeparam name="Response">Type of response.</typeparam>
             <param name="url">URL of your request.</param>
             <param name="request">Payload of your request.</param>
+            <param name="contentType">Optional Content-Type for your request. Defaults to "application/json" if omitted.</param>
             <param name="token">Optional Bearer token for your request.</param>
             <returns>Object returned from your request.</returns>
         </member>
-        <member name="M:magic.http.contracts.IHttpClient.PutAsync``2(System.String,``0,System.String)">
+        <member name="M:magic.http.contracts.IHttpClient.PutAsync``2(System.String,``0,System.String,System.String)">
             <summary>
             Puts an object asynchronously to the specified URL. Notice, you can supply a Stream as your request,
             and the service will intelligently determine it's a stream, and serialize it directly on to the HTTP request stream.
@@ -30,6 +31,7 @@
             <typeparam name="Response">Type of response.</typeparam>
             <param name="url">URL of your request.</param>
             <param name="request">Payload of your request.</param>
+            <param name="contentType">Optional Content-Type for your request. Defaults to "application/json" if omitted.</param>
             <param name="token">Optional Bearer token for your request.</param>
             <returns>Object returned from your request.</returns>
         </member>

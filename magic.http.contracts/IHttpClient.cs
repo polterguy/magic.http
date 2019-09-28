@@ -22,11 +22,13 @@ namespace magic.http.contracts
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
+        /// <param name="contentType">Optional Content-Type for your request. Defaults to "application/json" if omitted.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
         Task<Response> PostAsync<Request, Response>(
             string url,
             Request request,
+            string contentType = "application/json",
             string token = null);
 
         /// <summary>
@@ -37,11 +39,13 @@ namespace magic.http.contracts
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
+        /// <param name="contentType">Optional Content-Type for your request. Defaults to "application/json" if omitted.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
         Task<Response> PutAsync<Request, Response>(
             string url,
             Request request,
+            string contentType = "application/json",
             string token = null);
 
         /// <summary>
