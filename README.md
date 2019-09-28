@@ -26,6 +26,7 @@ The library supports the 4 most commonly HTTP verbs, below is a list.
 * DELETE
 
 The library provides 5 dead simple methods throughs its `IHttpClient`, which maps to the above HTTP verbs somehow.
+These methods should be fairly easily understood by most C# developers.
 
 * Task<Response> PostAsync<Request, Response>(string url, Request request, string contentType = "application/json", string token = null)
 * Task<Response> PutAsync<Request, Response>(string url, Request request, string contentType = "application/json", string token = null)
