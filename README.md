@@ -11,8 +11,9 @@ var result = await client.GetAsync<Blog[]>("https://my-json-server.typicode.com/
 ```
 
 The idea is that you provide your request type (if any), and your response type as generic arguments to its
-`IHttpClient` interface, and the library will perform automatic conversion on your behalf, reducing your
-HTTP REST invocations to a single line of code, resembling _"normal method invocations"_.
+`IHttpClient` interface methods, and the library will perform automatic conversion on your behalf, reducing your
+HTTP REST invocations to a single line of code, resembling _"normal method invocations"_. This provides an
+extremely simply to use API, and also allows you to have large amount of cohesion where you consume the library.
 
 The library supports all 4 most commonly verbs, below is a list.
 
