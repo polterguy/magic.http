@@ -55,10 +55,10 @@ it though.
 ## Installation
 
 You can either download the latest release, or install it directly through NuGet using the following installation
-command. Notice, there is also an _"magic.http.contracts"_ package, in case you want to only use its interface.
+command.
 
 ```
-Install-Package magic.http.services
+Install-Package magic.http
 ```
 
 ## Dependency injection
