@@ -1,6 +1,7 @@
 /*
  * Magic, Copyright(c) Thomas Hansen 2019 - thomas@gaiasoul.com
- * Licensed as Affero GPL unless an explicitly proprietary license has been obtained.
+ * Permission to use under the terms of the MIT license is hereby granted, see
+ * the enclosed LICENSE file for details.
  */
 
 using System;
@@ -11,6 +12,10 @@ namespace magic.http.contracts
 {
     /// <summary>
     /// Gives you easy one line of code access to invoke HTTP REST requests.
+    ///
+    /// If a non-successful HTTP response is returned from your endpoint, an
+    /// HttpException will be thrown, from where you can retrieve the StatusCode
+    /// and the friendly error message, if any from the HTTP endpoint.
     /// </summary>
     public interface IHttpClient
     {

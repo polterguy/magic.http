@@ -1,6 +1,7 @@
 /*
  * Magic, Copyright(c) Thomas Hansen 2019 - thomas@gaiasoul.com
- * Licensed as Affero GPL unless an explicitly proprietary license has been obtained.
+ * Permission to use under the terms of the MIT license is hereby granted, see
+ * the enclosed LICENSE file for details.
  */
 
 using System;
@@ -8,7 +9,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using net = System.Net.Http;
-using log4net;
 using Newtonsoft.Json.Linq;
 using magic.http.contracts;
 
@@ -20,7 +20,6 @@ namespace magic.http.services
     /// </summary>
     public class HttpClient : IHttpClient
     {
-        static readonly ILog _logger = LogManager.GetLogger(typeof(HttpClient));
         static readonly net.HttpClient _client = new net.HttpClient();
 
         #region [ -- Interface implementation -- ]
@@ -42,7 +41,6 @@ namespace magic.http.services
             string contentType = "application/json",
             string token = null)
         {
-            _logger.Info($"Invoking HTTP POST towards '{url}' with '{request}' as payload");
             return await CreateRequest<Response>(
                 url,
                 net.HttpMethod.Post,
@@ -68,7 +66,6 @@ namespace magic.http.services
             string contentType = "application/json",
             string token = null)
         {
-            _logger.Info($"Invoking HTTP PUT towards '{url}' with input '{request}'");
             return await CreateRequest<Response>(
                 url,
                 net.HttpMethod.Put,
@@ -88,7 +85,6 @@ namespace magic.http.services
             string url,
             string token = null)
         {
-            _logger.Info($"Invoking HTTP GET towards '{url}'");
             return await CreateRequest<Response>(
                 url,
                 net.HttpMethod.Get,
@@ -109,7 +105,6 @@ namespace magic.http.services
             Action<Stream> functor,
             string token = null)
         {
-            _logger.Info($"Invoking HTTP GET towards '{url}' with stream callback");
             await CreateRequest(
                 url,
                 net.HttpMethod.Get,
@@ -128,7 +123,6 @@ namespace magic.http.services
             string url,
             string token = null)
         {
-            _logger.Info($"Invoking HTTP DELETE towards '{url}'");
             return await CreateRequest<Response>(
                 url,
                 net.HttpMethod.Delete,
@@ -186,15 +180,18 @@ namespace magic.http.services
                     {
                         if (contentType != null)
                             content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
                         msg.Content = content;
                         return await GetResult<Response>(msg);
                     }
                 }
+
                 var stringContent = input is string strInput ? strInput : JObject.FromObject(input).ToString();
                 using (var content = new net.StringContent(stringContent))
                 {
                     if (contentType != null)
                         content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
                     msg.Content = content;
                     return await GetResult<Response>(msg);
                 }
@@ -232,7 +229,7 @@ namespace magic.http.services
                     {
                         // Checking is request was successful, and if not, throwing an exception.
                         if (!response.IsSuccessStatusCode)
-                            throw new Exception(await content.ReadAsStringAsync());
+                            throw new HttpException(await content.ReadAsStringAsync(), response.StatusCode);
 
                         functor(await content.ReadAsStreamAsync());
                     }
@@ -286,7 +283,7 @@ namespace magic.http.services
 
                     // Checking is request was successful, and if not, throwing an exception.
                     if (!response.IsSuccessStatusCode)
-                        throw new Exception(responseContent);
+                        throw new HttpException(responseContent, response.StatusCode);
 
                     // Checking if caller wants a string type of return
                     if (typeof(Response) == typeof(string))
