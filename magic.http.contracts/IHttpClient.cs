@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace magic.http.contracts
 {
     /// <summary>
-    /// Interface for accessing your HttpClient.
+    /// Gives you easy one line of code access to invoke HTTP REST requests.
     /// </summary>
     public interface IHttpClient
     {
@@ -24,7 +24,10 @@ namespace magic.http.contracts
         /// <param name="request">Payload of your request.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response> PostAsync<Request, Response>(string url, Request request, string token = null);
+        Task<Response> PostAsync<Request, Response>(
+            string url,
+            Request request,
+            string token = null);
 
         /// <summary>
         /// Puts an object asynchronously to the specified URL. Notice, you can supply a Stream as your request,
@@ -36,7 +39,10 @@ namespace magic.http.contracts
         /// <param name="request">Payload of your request.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response> PutAsync<Request, Response>(string url, Request request, string token = null);
+        Task<Response> PutAsync<Request, Response>(
+            string url,
+            Request request,
+            string token = null);
 
         /// <summary>
         /// Gets a resource from some URL.
@@ -45,7 +51,9 @@ namespace magic.http.contracts
         /// <param name="url">URL of your request.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response> GetAsync<Response>(string url, string token = null);
+        Task<Response> GetAsync<Response>(
+            string url,
+            string token = null);
 
         /// <summary>
         /// Gets a resource from some URL. Notice, this overload requires you to supply
@@ -57,7 +65,11 @@ namespace magic.http.contracts
         /// <param name="accept">Optional Accept HTTP header declaration, allowing you to explicitly declare what type of MIME content you can handle.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Async void Task</returns>
-        Task GetAsync(string url, Action<Stream> functor, string accept = null, string token = null);
+        Task GetAsync(
+            string url,
+            Action<Stream> functor,
+            string accept = null,
+            string token = null);
 
         /// <summary>
         /// Deletes some resource.
@@ -66,6 +78,8 @@ namespace magic.http.contracts
         /// <param name="url">URL of your request.</param>
         /// <param name="token">Optional Bearer token for your request.</param>
         /// <returns>Result of your request.</returns>
-        Task<Response> DeleteAsync<Response>(string url, string token = null);
+        Task<Response> DeleteAsync<Response>(
+            string url,
+            string token = null);
     }
 }

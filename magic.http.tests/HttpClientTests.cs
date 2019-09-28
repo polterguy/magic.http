@@ -14,8 +14,6 @@ using Xunit;
 using Newtonsoft.Json.Linq;
 using magic.http.services;
 using magic.http.contracts;
-using magic.signals.contracts;
-using magic.signals.services;
 
 namespace magic.http.tests
 {
@@ -23,6 +21,9 @@ namespace magic.http.tests
     {
         #region [ -- Unit tests -- ]
 
+        /*
+         * Checks that we can return a simple string from an HTTP GET request.
+         */
         [Fact]
         public async Task GetString()
         {
@@ -32,6 +33,9 @@ namespace magic.http.tests
             Assert.NotNull(result);
         }
 
+        /*
+         * Checks that we can return a JArray from a simple HTTP GET request.
+         */
         [Fact]
         public async Task GetJArray()
         {
@@ -42,8 +46,11 @@ namespace magic.http.tests
             Assert.Equal(3, result.Count);
         }
 
+        /*
+         * Verifies that we can return an array of objects from an HTTP GET request.
+         */
         [Fact]
-        public async Task GetObject()
+        public async Task GetArrayOfObjects()
         {
             var kernel = Initialize();
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
@@ -52,6 +59,9 @@ namespace magic.http.tests
             Assert.Equal(3, result.Length);
         }
 
+        /*
+         * Verifies that we can return an IEnumerable of objects from an HTTP GET request.
+         */
         [Fact]
         public async Task GetEnumerable()
         {
@@ -62,6 +72,10 @@ namespace magic.http.tests
             Assert.Equal(3, result.Count());
         }
 
+        /*
+         * Verifies that we can send and return a typed object using HTTP POST
+         * as both request payload and response payload.
+         */
         [Fact]
         public async Task PostObject()
         {
@@ -78,8 +92,12 @@ namespace magic.http.tests
             Assert.True(result.Id > 0);
         }
 
+        /*
+         * Verifies that we can return the HTTP response stream directly using
+         * a lambda callback for HTTP GET requests.
+         */
         [Fact]
-        public async Task PostStream()
+        public async Task GetStream()
         {
             var kernel = Initialize();
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
@@ -102,8 +120,11 @@ namespace magic.http.tests
             Assert.Equal(3, blogs.Length);
         }
 
+        /*
+         * Verifies that we can send a stream directly using HTTP POST.
+         */
         [Fact]
-        public async Task GetStream()
+        public async Task PostStream()
         {
             var kernel = Initialize();
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
@@ -115,7 +136,7 @@ namespace magic.http.tests
                 });
                 using (var writer = new StreamWriter(stream))
                 {
-                    writer.Write (jObject.ToString());
+                    writer.Write (jObject);
                     writer.Flush();
                     stream.Position = 0;
                     var result = await client.PostAsync<Stream, UserWithId>(
@@ -155,26 +176,9 @@ namespace magic.http.tests
             var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
             services.AddTransient<IConfiguration>((svc) => configuration);
-            services.AddTransient<ISignaler, Signaler>();
             services.AddTransient<IHttpClient, HttpClient>();
-            var types = new SignalsProvider(InstantiateAllTypes<ISlot>(services));
-            services.AddTransient<ISignalsProvider>((svc) => types);
             var provider = services.BuildServiceProvider();
             return provider;
-        }
-
-        static IEnumerable<Type> InstantiateAllTypes<T>(ServiceCollection services) where T : class
-        {
-            var type = typeof(T);
-            var result = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => type.IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract);
-
-            foreach (var idx in result)
-            {
-                services.AddTransient(idx);
-            }
-            return result;
         }
 
         #endregion
