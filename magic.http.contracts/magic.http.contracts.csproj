@@ -9,12 +9,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\projects\personal\magic.http\magic.http.contracts\magic.http.contracts.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\projects\personal\magic.http\magic.http.contracts\magic.http.contracts.xml</DocumentationFile>
+  <PropertyGroup>
+    <DocumentationFile>magic.http.contracts.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

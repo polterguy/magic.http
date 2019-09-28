@@ -330,3 +330,4 @@ ASALocalRun/
 .mfractor/
 magic.http.contracts/magic.http.contracts.xml
 magic.http.services/magic.http.services.xml
+.DS_Store
