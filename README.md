@@ -52,6 +52,15 @@ However, if you have that _"one feature request you simply must have"_, feel fre
 [issues](https://github.com/polterguy/magic.http/issues). If it makes the API more complex, I might not want to support
 it though.
 
+## Installation
+
+You can either download the latest release, or install it directly through NuGet using the following installation
+command. Notice, there is also an _"magic.http.contracts"_ package, in case you want to only use its interface.
+
+```
+Install-Package magic.http.services
+```
+
 ## Dependency injection
 
 The library is created to be _"dependency injection friendly"_, which implies you can use its `IHttpClient` interface

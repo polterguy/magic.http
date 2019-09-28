@@ -7,6 +7,14 @@
     <Copyright>Thomas Hansen, thomas@gaiasoul.com</Copyright>
     <PackageProjectUrl>http://github.com/polterguy/magic.http</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageVersion>1.0.1</PackageVersion>
+    <PackageIconUrl>https://polterguy.github.io/favicon.ico</PackageIconUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/polterguy/magic.http/master/LICENSE</PackageLicenseUrl>
+    <Owners>Thomas Hansen</Owners>
+    <Summary>Dead simple HTTP REST requests from C#</Summary>
+    <PackageTags>HTTP, REST</PackageTags>
+    <Title>Magic HTTP</Title>
   </PropertyGroup>
 
   <PropertyGroup>
