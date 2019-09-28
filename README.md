@@ -62,3 +62,9 @@ and the _"philosophy"_ of the library is to allow you to create HTTP REST reques
 such facilitate for simplified code, and great cohesion in your own code. The library will not support every single
 permutation of HTTP requests possible to create, due to that this would complicate its code, and result in that it over
 time degradates.
+
+## License
+
+You are allowed to use the library under the terms of the MIT license, which allows you to use it as you see fit, for
+any purpose, including in your own closed source software, without any restrictions, besides that you can't sue its
+author over its code for any reasons.
