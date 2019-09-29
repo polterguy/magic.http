@@ -81,11 +81,7 @@ namespace magic.http.services
                 url,
                 net.HttpMethod.Post,
                 request,
-                new Dictionary<string, string> {
-                    { "Accept", "application/json" },
-                    { "Content-Type", "application/json" },
-                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
-                });
+                GetDefaultBearerTokenHeaders(token));
         }
 
         /// <summary>
@@ -132,11 +128,7 @@ namespace magic.http.services
                 url,
                 net.HttpMethod.Put,
                 request,
-                new Dictionary<string, string> {
-                    { "Accept", "application/json" },
-                    { "Content-Type", "application/json" },
-                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
-                });
+                GetDefaultBearerTokenHeaders(token));
         }
 
         /// <summary>
@@ -170,11 +162,7 @@ namespace magic.http.services
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Get,
-                new Dictionary<string, string> {
-                    { "Accept", "application/json" },
-                    { "Content-Type", "application/json" },
-                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
-                });
+                GetDefaultBearerTokenHeaders(token));
         }
 
         /// <summary>
@@ -218,11 +206,7 @@ namespace magic.http.services
                 url,
                 net.HttpMethod.Get,
                 functor,
-                new Dictionary<string, string> {
-                    { "Accept", "application/json" },
-                    { "Content-Type", "application/json" },
-                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
-                });
+                GetDefaultBearerTokenHeaders(token));
         }
 
         /// <summary>
@@ -256,11 +240,7 @@ namespace magic.http.services
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Delete,
-                new Dictionary<string, string> {
-                    { "Accept", "application/json" },
-                    { "Content-Type", "application/json" },
-                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
-                });
+                GetDefaultBearerTokenHeaders(token));
         }
 
         #endregion
@@ -498,6 +478,15 @@ namespace magic.http.services
                         break;
                 }
             }
+        }
+
+        Dictionary<string, string> GetDefaultBearerTokenHeaders(string token)
+        {
+            return new Dictionary<string, string> {
+                    { "Accept", "application/json" },
+                    { "Content-Type", "application/json" },
+                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
+            };
         }
 
         #endregion
