@@ -16,17 +16,19 @@ namespace magic.http.services
 {
     /// <summary>
     /// Service implementation for IHttpClient. Uses System.Net.Http.HttpClient
-    /// to invoke your HTTP requests.
+    /// internally to invoke your HTTP requests.
     /// </summary>
     public class HttpClient : IHttpClient
     {
         static readonly net.HttpClient _client = new net.HttpClient();
 
+        // Default HTTP headers for an empty HTTP request.
         static readonly Dictionary<string, string> DEFAULT_HEADERS_EMPTY_REQUEST =
             new Dictionary<string, string> {
                 { "Accept", "application/json" },
             };
 
+        // Default HTTP headers for an HTTP request with a payload.
         static readonly Dictionary<string, string> DEFAULT_HEADERS_REQUEST =
             new Dictionary<string, string> {
                 { "Content-Type", "application/json" },
@@ -36,8 +38,10 @@ namespace magic.http.services
         #region [ -- Interface implementation -- ]
 
         /// <summary>
-        /// Posts an object asynchronously to the specified URL. Notice, you can supply a Stream as your request,
-        /// and the service will intelligently determine it's a stream, and serialize it directly on to the HTTP request stream.
+        /// Posts an object asynchronously to the specified URL. Notice, you can
+        /// supply a Stream as your request, and the service will intelligently
+        /// determine it's a stream, and serialize it directly on to the HTTP
+        /// request stream.
         /// </summary>
         /// <typeparam name="Request">Type of request.</typeparam>
         /// <typeparam name="Response">Type of response.</typeparam>
@@ -58,8 +62,37 @@ namespace magic.http.services
         }
 
         /// <summary>
-        /// Puts an object asynchronously to the specified URL. Notice, you can supply a Stream as your request,
-        /// and the service will intelligently determine it's a stream, and serialize it directly on to the HTTP request stream.
+        /// Posts an object asynchronously to the specified URL with the specified Bearer token.
+        /// Notice, you can supply a Stream as your request, and the service will intelligently
+        /// determine it's a stream, and serialize it directly on to the HTTP request stream.
+        /// </summary>
+        /// <typeparam name="Request">Type of request.</typeparam>
+        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <param name="url">URL of your request.</param>
+        /// <param name="request">Payload of your request.</param>
+        /// <param name="token">Bearer token for your request.</param>
+        /// <returns>Object returned from your request.</returns>
+        public async Task<Response> PostAsync<Request, Response>(
+            string url,
+            Request request,
+            string token)
+        {
+            return await CreateContentRequest<Response>(
+                url,
+                net.HttpMethod.Post,
+                request,
+                new Dictionary<string, string> {
+                    { "Accept", "application/json" },
+                    { "Content-Type", "application/json" },
+                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
+                });
+        }
+
+        /// <summary>
+        /// Puts an object asynchronously to the specified URL. Notice, you can
+        /// supply a Stream as your request, and the service will intelligently
+        /// determine it's a stream, and serialize it directly on to the HTTP
+        /// request stream.
         /// </summary>
         /// <typeparam name="Request">Type of request.</typeparam>
         /// <typeparam name="Response">Type of response.</typeparam>
@@ -80,6 +113,33 @@ namespace magic.http.services
         }
 
         /// <summary>
+        /// Puts an object asynchronously to the specified URL with the specified Bearer token.
+        /// Notice, you can supply a Stream as your request, and the service will intelligently
+        /// determine it's a stream, and serialize it directly on to the HTTP request stream.
+        /// </summary>
+        /// <typeparam name="Request">Type of request.</typeparam>
+        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <param name="url">URL of your request.</param>
+        /// <param name="request">Payload of your request.</param>
+        /// <param name="token">Bearer token for your request.</param>
+        /// <returns>Object returned from your request.</returns>
+        public async Task<Response> PutAsync<Request, Response>(
+            string url,
+            Request request,
+            string token)
+        {
+            return await CreateContentRequest<Response>(
+                url,
+                net.HttpMethod.Put,
+                request,
+                new Dictionary<string, string> {
+                    { "Accept", "application/json" },
+                    { "Content-Type", "application/json" },
+                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
+                });
+        }
+
+        /// <summary>
         /// Gets a resource from some URL.
         /// </summary>
         /// <typeparam name="Response">Type of response.</typeparam>
@@ -94,6 +154,27 @@ namespace magic.http.services
                 url,
                 net.HttpMethod.Get,
                 headers ?? DEFAULT_HEADERS_EMPTY_REQUEST);
+        }
+
+        /// <summary>
+        /// Gets a resource from some URL with the specified Bearer token.
+        /// </summary>
+        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <param name="url">URL of your request.</param>
+        /// <param name="token">Bearer token for your request.</param>
+        /// <returns>Object returned from your request.</returns>
+        public async Task<Response> GetAsync<Response>(
+            string url,
+            string token)
+        {
+            return await CreateEmptyRequest<Response>(
+                url,
+                net.HttpMethod.Get,
+                new Dictionary<string, string> {
+                    { "Accept", "application/json" },
+                    { "Content-Type", "application/json" },
+                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
+                });
         }
 
         /// <summary>
@@ -118,6 +199,33 @@ namespace magic.http.services
         }
 
         /// <summary>
+        /// Gets a resource from some URL with the specified Bearer token.
+        /// Notice, this overload requires you to supply an Action taking a Stream
+        /// as its input, from where you can directly access the response content,
+        /// without having to load it into memory. This i suseful for downloading
+        /// larger documents from some URL.
+        /// </summary>
+        /// <param name="url">URL of your request.</param>
+        /// <param name="functor">Action lambda function given the response Stream for you to do whatever you wish with once the request returns.</param>
+        /// <param name="token">Bearer token for your request.</param>
+        /// <returns>Async void Task</returns>
+        public async Task GetAsync(
+            string url,
+            Action<Stream> functor,
+            string token)
+        {
+            await CreateEmptyRequestStreamResponse(
+                url,
+                net.HttpMethod.Get,
+                functor,
+                new Dictionary<string, string> {
+                    { "Accept", "application/json" },
+                    { "Content-Type", "application/json" },
+                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
+                });
+        }
+
+        /// <summary>
         /// Deletes some resource.
         /// </summary>
         /// <typeparam name="Response">Type of response.</typeparam>
@@ -132,6 +240,27 @@ namespace magic.http.services
                 url,
                 net.HttpMethod.Delete,
                 headers ?? DEFAULT_HEADERS_EMPTY_REQUEST);
+        }
+
+        /// <summary>
+        /// Deletes some resource with the specified Bearer token.
+        /// </summary>
+        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <param name="url">URL of your request.</param>
+        /// <param name="token">Bearer token for your request.</param>
+        /// <returns>Result of your request.</returns>
+        public async Task<Response> DeleteAsync<Response>(
+            string url,
+            string token)
+        {
+            return await CreateEmptyRequest<Response>(
+                url,
+                net.HttpMethod.Delete,
+                new Dictionary<string, string> {
+                    { "Accept", "application/json" },
+                    { "Content-Type", "application/json" },
+                    { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
+                });
         }
 
         #endregion
@@ -153,10 +282,10 @@ namespace magic.http.services
             net.HttpMethod method,
             Dictionary<string, string> headers)
         {
-            return await CreateRequestMessage(url, method, headers, async (msg) =>
+            using (var msg = CreateRequestMessage(method, url, headers))
             {
                 return await GetResult<Response>(msg);
-            });
+            }
         }
 
         /// <summary>
@@ -175,7 +304,7 @@ namespace magic.http.services
             object input,
             Dictionary<string, string> headers)
         {
-            return await CreateRequestMessage(url, method, headers, async (msg) =>
+            using (var msg = CreateRequestMessage(method, url, headers))
             {
                 if (input is Stream stream)
                 {
@@ -197,7 +326,7 @@ namespace magic.http.services
                     msg.Content = content;
                     return await GetResult<Response>(msg);
                 }
-            });
+            }
         }
 
         /// <summary>
@@ -223,7 +352,7 @@ namespace magic.http.services
                 {
                     using (var content = response.Content)
                     {
-                        // Checking is request was successful, and if not, throwing an exception.
+                        // Checking if request was successful, and if not, throwing an exception.
                         if (!response.IsSuccessStatusCode)
                             throw new HttpException(await content.ReadAsStringAsync(), response.StatusCode);
 
@@ -234,35 +363,12 @@ namespace magic.http.services
         }
 
         /// <summary>
-        /// Responsible for creating an HTTP request message for you, which
-        /// by default is only interested in JSON and plain text result.
-        /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="method">HTTP method or verb to create your request as.</param>
-        /// <param name="headers">HTTP headers for your request.</param>
-        /// <param name="functor">Callback function that will be invoked with
-        /// your message when your request has been created.</param>
-        /// <returns></returns>
-        virtual protected async Task<Response> CreateRequestMessage<Response>(
-            string url,
-            net.HttpMethod method,
-            Dictionary<string, string> headers,
-            Func<net.HttpRequestMessage, Task<Response>> functor)
-        {
-            using(var msg = CreateRequestMessage(method, url, headers))
-            {
-                return await functor(msg);
-            }
-        }
-
-        /// <summary>
         /// Responsible for sending and retrieving your HTTP request and response.
         /// Only invoked if you are requesting a non Stream result.
         /// </summary>
-        /// <typeparam name="Response"></typeparam>
-        /// <param name="msg"></param>
-        /// <returns></returns>
+        /// <typeparam name="Response">Response type from endpoint.</typeparam>
+        /// <param name="msg">HTTP request message.</param>
+        /// <returns>Object returned from your request.</returns>
         virtual protected async Task<Response> GetResult<Response>(net.HttpRequestMessage msg)
         {
             using (var response = await _client.SendAsync(msg))
@@ -340,7 +446,7 @@ namespace magic.http.services
                  * This allows us to support any HTTP headers, including any custom
                  * headers.
                  */
-                switch(idx)
+                switch (idx)
                 {
                     case "Allow":
                     case "Content-Disposition":

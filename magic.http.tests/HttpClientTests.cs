@@ -62,6 +62,37 @@ namespace magic.http.tests
         }
 
         /*
+         * Verifies that we can return an array of objects from an HTTP GET request.
+         */
+        [Fact]
+        public async Task GetWithToken()
+        {
+            var kernel = Initialize();
+            var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
+            var result = await client.GetAsync<Blog[]>(
+                "https://my-json-server.typicode.com/typicode/demo/posts",
+                "foo");
+            Assert.NotNull(result);
+            Assert.Equal(3, result.Length);
+        }
+
+        /*
+         * Verifies that we can return an array of objects from an HTTP GET request.
+         */
+        [Fact]
+        public async Task GetWithNullToken_Throws()
+        {
+            var kernel = Initialize();
+            var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
+            string token = null;
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => {
+                await client.GetAsync<Blog[]>(
+                    "https://my-json-server.typicode.com/typicode/demo/posts",
+                    token /* Throws */);
+                });
+        }
+
+        /*
          * Verifies that we can return an IEnumerable of objects from an HTTP GET request.
          */
         [Fact]
