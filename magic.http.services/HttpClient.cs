@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using net = System.Net.Http;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Logging;
 using magic.http.contracts;
 
 namespace magic.http.services
@@ -21,6 +22,7 @@ namespace magic.http.services
     public class HttpClient : IHttpClient
     {
         static readonly net.HttpClient _client = new net.HttpClient();
+        readonly Func<string, net.HttpClient> _factory = (url) => _client;
 
         // Default HTTP headers for an empty HTTP request.
         static readonly Dictionary<string, string> DEFAULT_HEADERS_EMPTY_REQUEST =
@@ -34,6 +36,48 @@ namespace magic.http.services
                 { "Content-Type", "application/json" },
                 { "Accept", "application/json" },
             };
+
+        readonly ILogger _logger;
+
+        /// <summary>
+        /// Creates a new instance of your HttpClient without logging, using a
+        /// static single .Net HttpClient.
+        /// </summary>
+        public HttpClient()
+        { }
+
+        /// <summary>
+        /// Creates a new instance of your HttpClient with the specified logger
+        /// using a single static .Net HttpClient.
+        /// </summary>
+        /// <param name="logger">Logger to log every request and errors to.</param>
+        public HttpClient(ILogger logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <summary>
+        /// Creates a new instance of your HttpClient with the specified HttpClient
+        /// factory function and no logging.
+        /// </summary>
+        /// <param name="factory"></param>
+        public HttpClient(Func<string, net.HttpClient> factory)
+        {
+            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+        }
+
+        /// <summary>
+        /// Creates a new instance of your HttpClient with the specified HttpClient
+        /// factory function, and the specified logger.
+        /// </summary>
+        /// <param name="logger">Logger to log every request and errors to</param>
+        /// <param name="factory">Factory function to use to create .Net HttpClient
+        /// instances from.</param>
+        public HttpClient(ILogger logger, Func<string, net.HttpClient> factory)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+        }
 
         #region [ -- Interface implementation -- ]
 
@@ -54,6 +98,7 @@ namespace magic.http.services
             Request request,
             Dictionary<string, string> headers = null)
         {
+            _logger?.LogInformation($"'{url}' invoked with POST and '{request}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Post,
@@ -77,6 +122,7 @@ namespace magic.http.services
             Request request,
             string token)
         {
+            _logger?.LogInformation($"'{url}' invoked with POST, '{request}' and Bearer token of '{token}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Post,
@@ -101,6 +147,7 @@ namespace magic.http.services
             Request request,
             Dictionary<string, string> headers = null)
         {
+            _logger?.LogInformation($"'{url}' invoked with PUT and '{request}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Put,
@@ -124,6 +171,7 @@ namespace magic.http.services
             Request request,
             string token)
         {
+            _logger?.LogInformation($"'{url}' invoked with PUT, '{request}' and Bearer token of '{token}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Put,
@@ -142,6 +190,7 @@ namespace magic.http.services
             string url,
             Dictionary<string, string> headers = null)
         {
+            _logger?.LogInformation($"'{url}' invoked with GET");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Get,
@@ -159,6 +208,7 @@ namespace magic.http.services
             string url,
             string token)
         {
+            _logger?.LogInformation($"'{url}' invoked with GET and Bearer token of '{token}'");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Get,
@@ -179,6 +229,7 @@ namespace magic.http.services
             Action<Stream> functor,
             Dictionary<string, string> headers = null)
         {
+            _logger?.LogInformation($"'{url}' invoked with GET for Stream response");
             await CreateEmptyRequestStreamResponse(
                 url,
                 net.HttpMethod.Get,
@@ -202,6 +253,7 @@ namespace magic.http.services
             Action<Stream> functor,
             string token)
         {
+            _logger?.LogInformation($"'{url}' invoked with GET and Bearer token of '{token}'");
             await CreateEmptyRequestStreamResponse(
                 url,
                 net.HttpMethod.Get,
@@ -220,6 +272,7 @@ namespace magic.http.services
             string url,
             Dictionary<string, string> headers = null)
         {
+            _logger?.LogInformation($"'{url}' invoked with DELETE");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Delete,
@@ -237,6 +290,7 @@ namespace magic.http.services
             string url,
             string token)
         {
+            _logger?.LogInformation($"'{url}' invoked with DELETE and Bearer token '{token}'");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Delete,
@@ -264,7 +318,7 @@ namespace magic.http.services
         {
             using (var msg = CreateRequestMessage(method, url, headers))
             {
-                return await GetResult<Response>(msg);
+                return await GetResult<Response>(url, msg);
             }
         }
 
@@ -292,7 +346,7 @@ namespace magic.http.services
                     {
                         AddContentHeaders(content, headers);
                         msg.Content = content;
-                        return await GetResult<Response>(msg);
+                        return await GetResult<Response>(url, msg);
                     }
                 }
 
@@ -304,7 +358,7 @@ namespace magic.http.services
                 {
                     AddContentHeaders(content, headers);
                     msg.Content = content;
-                    return await GetResult<Response>(msg);
+                    return await GetResult<Response>(url, msg);
                 }
             }
         }
@@ -328,13 +382,17 @@ namespace magic.http.services
         {
             using (var msg = CreateRequestMessage(method, url, headers))
             {
-                using (var response = await _client.SendAsync(msg))
+                using (var response = await _factory(url).SendAsync(msg))
                 {
                     using (var content = response.Content)
                     {
                         // Checking if request was successful, and if not, throwing an exception.
                         if (!response.IsSuccessStatusCode)
-                            throw new HttpException(await content.ReadAsStringAsync(), response.StatusCode);
+                        {
+                            var statusText = await content.ReadAsStringAsync();
+                            _logger?.LogError($"'{url}' invoked with '{method}' returned {response.StatusCode} and '{statusText}'");
+                            throw new HttpException(statusText, response.StatusCode);
+                        }
 
                         functor(await content.ReadAsStreamAsync());
                     }
@@ -349,9 +407,11 @@ namespace magic.http.services
         /// <typeparam name="Response">Response type from endpoint.</typeparam>
         /// <param name="msg">HTTP request message.</param>
         /// <returns>Object returned from your request.</returns>
-        virtual protected async Task<Response> GetResult<Response>(net.HttpRequestMessage msg)
+        virtual protected async Task<Response> GetResult<Response>(
+            string url,
+            net.HttpRequestMessage msg)
         {
-            using (var response = await _client.SendAsync(msg))
+            using (var response = await _factory(url).SendAsync(msg))
             {
                 using (var content = response.Content)
                 {
