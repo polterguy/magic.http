@@ -7,6 +7,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace magic.http.contracts
 {
@@ -27,14 +28,12 @@ namespace magic.http.contracts
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
-        /// <param name="contentType">Optional Content-Type for your request. Defaults to "application/json" if omitted.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
         Task<Response> PostAsync<Request, Response>(
             string url,
             Request request,
-            string contentType = "application/json",
-            string token = null);
+            Dictionary<string, string> headers = null);
 
         /// <summary>
         /// Puts an object asynchronously to the specified URL. Notice, you can supply a Stream as your request,
@@ -44,25 +43,23 @@ namespace magic.http.contracts
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
-        /// <param name="contentType">Optional Content-Type for your request. Defaults to "application/json" if omitted.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
         Task<Response> PutAsync<Request, Response>(
             string url,
             Request request,
-            string contentType = "application/json",
-            string token = null);
+            Dictionary<string, string> headers = null);
 
         /// <summary>
         /// Gets a resource from some URL.
         /// </summary>
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
         Task<Response> GetAsync<Response>(
             string url,
-            string token = null);
+            Dictionary<string, string> headers = null);
 
         /// <summary>
         /// Gets a resource from some URL. Notice, this overload requires you to supply
@@ -71,22 +68,22 @@ namespace magic.http.contracts
         /// </summary>
         /// <param name="url">URL of your request.</param>
         /// <param name="functor">Action lambda function given the response Stream for you to do whatever you wish with once the request returns.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Async void Task</returns>
         Task GetAsync(
             string url,
             Action<Stream> functor,
-            string token = null);
+            Dictionary<string, string> headers = null);
 
         /// <summary>
         /// Deletes some resource.
         /// </summary>
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Result of your request.</returns>
         Task<Response> DeleteAsync<Response>(
             string url,
-            string token = null);
+            Dictionary<string, string> headers = null);
     }
 }

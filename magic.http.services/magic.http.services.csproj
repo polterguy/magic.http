@@ -8,7 +8,7 @@
     <PackageProjectUrl>http://github.com/polterguy/magic.http</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackOnBuild>true</PackOnBuild>
-    <PackageVersion>1.0.1</PackageVersion>
+    <PackageVersion>1.1.0</PackageVersion>
     <PackageIconUrl>https://polterguy.github.io/favicon.ico</PackageIconUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/polterguy/magic.http/master/LICENSE</PackageLicenseUrl>
     <Owners>Thomas Hansen</Owners>
@@ -16,7 +16,7 @@
     <PackageTags>HTTP, REST</PackageTags>
     <Title>Magic HTTP</Title>
     <PackageId>magic.http</PackageId>
-    <PackageReleaseNotes>First serious release</PackageReleaseNotes>
+    <PackageReleaseNotes>Removed log4net dependency, and created custom exception class, allowing the caller to retrieve HTTP status response code from endpoint</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>

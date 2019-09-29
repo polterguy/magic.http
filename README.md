@@ -25,8 +25,8 @@ The library supports the 4 most commonly HTTP verbs, below is a list.
 * PUT
 * DELETE
 
-The library provides 5 dead simple methods throughs its `IHttpClient`, which maps to the above HTTP verbs somehow.
-These methods should be fairly easily understood by most C# developers.
+The library provides 5 dead simple methods throughs its `IHttpClient` interface, which maps to the above HTTP verbs
+somehow. These methods should be fairly easily understood by most C# developers.
 
 * PostAsync(url, request)
 * PutAsync(url, request)
@@ -35,9 +35,8 @@ These methods should be fairly easily understood by most C# developers.
 * DeleteAsync(url)
 
 The `POST` and `PUT` verbs requires payload objects, that you provide as typed generic arguments, while the `DELETE` and `GET`
-verbs does not allow you to supply payloads. In addition you can optionally supply a _"token"_, normally a JWT token, that
-will be transmitted in the HTTP Authorize header of your request, as a _"Bearer"_ token. You can also explicitly declare
-which type of `Content-Type` your PUT and POST requests are having as their payloads.
+verbs does not allow you to supply payloads. In addition you can optionally supply a dictionary of HTTP headers, that
+will correctly decorate your HTTP content and your HTTP request message, depending upon where it belongs.
 
 In addition the library will _"intelligently"_ handle `Stream` requests for POST and PUT, allowing you to
 supply a `Stream` as a request object, which will serialize your stream directly on to the HTTP request

@@ -54,7 +54,9 @@ namespace magic.http.tests
         {
             var kernel = Initialize();
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
-            var result = await client.GetAsync<Blog[]>("https://my-json-server.typicode.com/typicode/demo/posts");
+            var result = await client.GetAsync<Blog[]>(
+                "https://my-json-server.typicode.com/typicode/demo/posts",
+                new Dictionary<string, string> { { "Accept", "application/json" } });
             Assert.NotNull(result);
             Assert.Equal(3, result.Length);
         }

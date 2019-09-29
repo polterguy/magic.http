@@ -7,7 +7,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Net.Http.Headers;
+using System.Collections.Generic;
 using net = System.Net.Http;
 using Newtonsoft.Json.Linq;
 using magic.http.contracts;
@@ -22,6 +22,17 @@ namespace magic.http.services
     {
         static readonly net.HttpClient _client = new net.HttpClient();
 
+        static readonly Dictionary<string, string> DEFAULT_HEADERS_EMPTY_REQUEST =
+            new Dictionary<string, string> {
+                { "Accept", "application/json" },
+            };
+
+        static readonly Dictionary<string, string> DEFAULT_HEADERS_REQUEST =
+            new Dictionary<string, string> {
+                { "Content-Type", "application/json" },
+                { "Accept", "application/json" },
+            };
+
         #region [ -- Interface implementation -- ]
 
         /// <summary>
@@ -32,21 +43,18 @@ namespace magic.http.services
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
-        /// <param name="contentType">Optional Content-Type for your request. Defaults to "application/json" if omitted.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
         public async Task<Response> PostAsync<Request, Response>(
             string url,
             Request request,
-            string contentType = "application/json",
-            string token = null)
+            Dictionary<string, string> headers = null)
         {
-            return await CreateRequest<Response>(
+            return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Post,
                 request,
-                contentType,
-                token);
+                headers ?? DEFAULT_HEADERS_REQUEST);
         }
 
         /// <summary>
@@ -57,21 +65,18 @@ namespace magic.http.services
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
-        /// <param name="contentType">Optional Content-Type for your request. Defaults to "application/json" if omitted.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
         public async Task<Response> PutAsync<Request, Response>(
             string url,
             Request request,
-            string contentType = "application/json",
-            string token = null)
+            Dictionary<string, string> headers = null)
         {
-            return await CreateRequest<Response>(
+            return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Put,
                 request,
-                contentType,
-                token);
+                headers ?? DEFAULT_HEADERS_REQUEST);
         }
 
         /// <summary>
@@ -79,16 +84,16 @@ namespace magic.http.services
         /// </summary>
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
         public async Task<Response> GetAsync<Response>(
             string url,
-            string token = null)
+            Dictionary<string, string> headers = null)
         {
-            return await CreateRequest<Response>(
+            return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Get,
-                token);
+                headers ?? DEFAULT_HEADERS_EMPTY_REQUEST);
         }
 
         /// <summary>
@@ -98,18 +103,18 @@ namespace magic.http.services
         /// </summary>
         /// <param name="url">URL of your request.</param>
         /// <param name="functor">Action lambda function given the response Stream for you to do whatever you wish with once the request returns.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Async void Task</returns>
         public async Task GetAsync(
             string url,
             Action<Stream> functor,
-            string token = null)
+            Dictionary<string, string> headers = null)
         {
-            await CreateRequest(
+            await CreateEmptyRequestStreamResponse(
                 url,
                 net.HttpMethod.Get,
                 functor,
-                token);
+                headers ?? DEFAULT_HEADERS_EMPTY_REQUEST);
         }
 
         /// <summary>
@@ -117,16 +122,16 @@ namespace magic.http.services
         /// </summary>
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Result of your request.</returns>
         public async Task<Response> DeleteAsync<Response>(
             string url,
-            string token = null)
+            Dictionary<string, string> headers = null)
         {
-            return await CreateRequest<Response>(
+            return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Delete,
-                token);
+                headers ?? DEFAULT_HEADERS_EMPTY_REQUEST);
         }
 
         #endregion
@@ -141,14 +146,14 @@ namespace magic.http.services
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="method">HTTP method or verb to create your request as.</param>
-        /// <param name="token">Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        virtual protected async Task<Response> CreateRequest<Response>(
+        virtual protected async Task<Response> CreateEmptyRequest<Response>(
             string url,
             net.HttpMethod method,
-            string token)
+            Dictionary<string, string> headers)
         {
-            return await CreateRequestMessage(url, method, token, async (msg) =>
+            return await CreateRequestMessage(url, method, headers, async (msg) =>
             {
                 return await GetResult<Response>(msg);
             });
@@ -162,36 +167,33 @@ namespace magic.http.services
         /// <param name="url">URL of your request.</param>
         /// <param name="method">HTTP method or verb to create your request as.</param>
         /// <param name="input">Payload for your request.</param>
-        /// <param name="contentType">Content-Type for your request.</param>
-        /// <param name="token">Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        virtual protected async Task<Response> CreateRequest<Response>(
+        virtual protected async Task<Response> CreateContentRequest<Response>(
             string url,
             net.HttpMethod method,
             object input,
-            string contentType,
-            string token)
+            Dictionary<string, string> headers)
         {
-            return await CreateRequestMessage(url, method, token, async (msg) =>
+            return await CreateRequestMessage(url, method, headers, async (msg) =>
             {
                 if (input is Stream stream)
                 {
                     using (var content = new net.StreamContent(stream))
                     {
-                        if (contentType != null)
-                            content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-
+                        AddContentHeaders(content, headers);
                         msg.Content = content;
                         return await GetResult<Response>(msg);
                     }
                 }
 
-                var stringContent = input is string strInput ? strInput : JObject.FromObject(input).ToString();
+                var stringContent = input is string strInput ?
+                    strInput :
+                    JObject.FromObject(input).ToString();
+
                 using (var content = new net.StringContent(stringContent))
                 {
-                    if (contentType != null)
-                        content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-
+                    AddContentHeaders(content, headers);
                     msg.Content = content;
                     return await GetResult<Response>(msg);
                 }
@@ -207,22 +209,16 @@ namespace magic.http.services
         /// <param name="method">HTTP method or verb to create your request as.</param>
         /// <param name="functor">Callback function that will be invoked with the response
         /// stream when it is ready.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>An async Task</returns>
-        virtual protected async Task CreateRequest(
+        virtual protected async Task CreateEmptyRequestStreamResponse(
             string url,
             net.HttpMethod method,
             Action<Stream> functor,
-            string token)
+            Dictionary<string, string> headers)
         {
-            using(var msg = new net.HttpRequestMessage())
+            using (var msg = CreateRequestMessage(method, url, headers))
             {
-                msg.RequestUri = new Uri(url);
-                msg.Method = method;
-
-                if (token != null)
-                    msg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
                 using (var response = await _client.SendAsync(msg))
                 {
                     using (var content = response.Content)
@@ -244,24 +240,18 @@ namespace magic.http.services
         /// <typeparam name="Response">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="method">HTTP method or verb to create your request as.</param>
-        /// <param name="token">Optional Bearer token for your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
         /// <param name="functor">Callback function that will be invoked with
         /// your message when your request has been created.</param>
         /// <returns></returns>
         virtual protected async Task<Response> CreateRequestMessage<Response>(
             string url,
             net.HttpMethod method,
-            string token,
+            Dictionary<string, string> headers,
             Func<net.HttpRequestMessage, Task<Response>> functor)
         {
-            using(var msg = new net.HttpRequestMessage())
+            using(var msg = CreateRequestMessage(method, url, headers))
             {
-                msg.RequestUri = new Uri(url);
-                msg.Method = method;
-
-                if (token != null)
-                    msg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
                 return await functor(msg);
             }
         }
@@ -315,6 +305,91 @@ namespace magic.http.services
                      * and returns object to caller.
                      */
                     return objResult.ToObject<Response>();
+                }
+            }
+        }
+
+        #endregion
+
+        #region [ -- Private helper methods -- ]
+
+        /*
+         * Creates a new request message, and decorates it with the relevant
+         * HTTP headers.
+         */
+        net.HttpRequestMessage CreateRequestMessage(
+            net.HttpMethod method,
+            string url,
+            Dictionary<string, string> headers)
+        {
+            var msg = new net.HttpRequestMessage
+            {
+                RequestUri = new Uri(url),
+                Method = method
+            };
+
+            foreach (var idx in headers.Keys)
+            {
+                /*
+                 * Notice, we're simply ignoring all headers that belongs to the content,
+                 * and adding all other headers to the request.
+                 * 
+                 * This is done since all HttpContent headers are added later, but
+                 * only if content is being transmitted.
+                 *
+                 * This allows us to support any HTTP headers, including any custom
+                 * headers.
+                 */
+                switch(idx)
+                {
+                    case "Allow":
+                    case "Content-Disposition":
+                    case "Content-Encoding":
+                    case "Content-Language":
+                    case "Content-Length":
+                    case "Content-Location":
+                    case "Content-MD5":
+                    case "Content-Range":
+                    case "Content-Type":
+                    case "Expires":
+                    case "Last-Modified":
+                        break;
+                    default:
+                        msg.Headers.Add(idx, headers[idx]);
+                        break;
+                }
+            }
+            return msg;
+        }
+
+        /*
+         * Decorates the HTTP content with the relevant HTTP headers from the
+         * specified dictionary.
+         */
+        void AddContentHeaders(net.HttpContent content, Dictionary<string, string> headers)
+        {
+            foreach (var idx in headers.Keys)
+            {
+                /*
+                 * Adding all Content HTTP headers, and ignoring the rest
+                 */
+                switch (idx)
+                {
+                    case "Allow":
+                    case "Content-Disposition":
+                    case "Content-Encoding":
+                    case "Content-Language":
+                    case "Content-Length":
+                    case "Content-Location":
+                    case "Content-MD5":
+                    case "Content-Range":
+                    case "Content-Type":
+                    case "Expires":
+                    case "Last-Modified":
+                        if (content.Headers.Contains(idx))
+                            content.Headers.Remove(idx);
+                        content.Headers.Add(idx, headers[idx]);
+                        break;
                 }
             }
         }
