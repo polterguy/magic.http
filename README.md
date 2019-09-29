@@ -82,6 +82,11 @@ such facilitate for simplified code, and great cohesion in your own code. The li
 permutation of HTTP requests possible to create, due to that this would complicate its code, and results in that it
 degradates over time.
 
+The `HttpClient` implementation class, also provides multiple CTORs, allowing you to pass in `ILogger`, and
+a _"factory function"_ for creating .Net `HttpClient` instances, which allows you to use among other things
+the `IHttpClientFactory` in .Net Core projects, without bringing in dependencies upon it, which would break
+.Net Framework compatibility.
+
 ## License
 
 Copyright (c) 2019 Thomas Hansen, thomas@gaiasoul.com
