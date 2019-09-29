@@ -405,6 +405,7 @@ namespace magic.http.services
         /// Only invoked if you are requesting a non Stream result.
         /// </summary>
         /// <typeparam name="Response">Response type from endpoint.</typeparam>
+        /// <param name="url">URL for your request.</param>
         /// <param name="msg">HTTP request message.</param>
         /// <returns>Object returned from your request.</returns>
         virtual protected async Task<Response> GetResult<Response>(
