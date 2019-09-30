@@ -16,7 +16,7 @@ var result = await client.GetAsync<Blog[]>("https://my-json-server.typicode.com/
 The idea is that you provide your request type (if any), and your response type as generic arguments to its
 `IHttpClient` interface methods, and the library will perform automatic conversion on your behalf, reducing your
 HTTP REST invocations to a single line of code, resembling _"normal method invocations"_. This provides an
-extremely simply to use API, and also allows you to have large amount of cohesion where you consume the library.
+extremely simply to use API, and also allows you to have large amount of cohesion in your own code.
 
 The library supports the 4 most commonly HTTP verbs, below is a list.
 
@@ -36,7 +36,9 @@ somehow. These methods should be fairly easily understood by most C# developers.
 
 The `POST` and `PUT` verbs requires payload objects, that you provide as typed generic arguments, while the `DELETE` and `GET`
 verbs does not allow you to supply payloads. In addition you can optionally supply a dictionary of HTTP headers, that
-will correctly decorate your HTTP content and your HTTP request message, depending upon where it belongs.
+will correctly decorate your HTTP content and your HTTP request message, depending upon where it belongs. There are also
+convenience methods for invoking HTTP REST endpoints with _"Bearer"_ authorization tokens, automatically taking care of
+adding your tokens correctly to your requests.
 
 In addition the library will _"intelligently"_ handle `Stream` requests for POST and PUT, allowing you to
 supply a `Stream` as a request object, which will serialize your stream directly on to the HTTP request

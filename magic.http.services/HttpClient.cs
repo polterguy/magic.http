@@ -21,8 +21,8 @@ namespace magic.http.services
     /// </summary>
     public class HttpClient : IHttpClient
     {
-        static readonly net.HttpClient _client = new net.HttpClient();
-        readonly Func<string, net.HttpClient> _factory = (url) => _client;
+        static readonly Lazy<net.HttpClient> _client = new Lazy<net.HttpClient>(() => new net.HttpClient());
+        readonly Func<string, net.HttpClient> _factory = (url) => _client.Value;
 
         // Default HTTP headers for an empty HTTP request.
         static readonly Dictionary<string, string> DEFAULT_HEADERS_EMPTY_REQUEST =
