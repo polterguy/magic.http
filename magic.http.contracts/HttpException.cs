@@ -1,5 +1,5 @@
 /*
- * Magic, Copyright(c) Thomas Hansen 2019 - thomas@gaiasoul.com
+ * Magic, Copyright(c) Thomas Hansen 2019, thomas@gaiasoul.com, all rights reserved.
  * Permission to use under the terms of the MIT license is hereby granted, see
  * the enclosed LICENSE file for details.
  */
