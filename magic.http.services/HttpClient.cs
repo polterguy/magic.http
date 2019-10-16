@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using net = System.Net.Http;
 using Newtonsoft.Json.Linq;
-using Microsoft.Extensions.Logging;
 using magic.http.contracts;
 
 namespace magic.http.services
@@ -98,7 +97,7 @@ namespace magic.http.services
             Request request,
             Dictionary<string, string> headers = null)
         {
-            _logger?.LogInformation($"'{url}' invoked with POST and '{request}'");
+            _logger?.Info($"'{url}' invoked with POST and '{request}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Post,
@@ -122,7 +121,7 @@ namespace magic.http.services
             Request request,
             string token)
         {
-            _logger?.LogInformation($"'{url}' invoked with POST, '{request}' and Bearer token of '{token}'");
+            _logger?.Info($"'{url}' invoked with POST, '{request}' and Bearer token of '{token}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Post,
@@ -147,7 +146,7 @@ namespace magic.http.services
             Request request,
             Dictionary<string, string> headers = null)
         {
-            _logger?.LogInformation($"'{url}' invoked with PUT and '{request}'");
+            _logger?.Info($"'{url}' invoked with PUT and '{request}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Put,
@@ -171,7 +170,7 @@ namespace magic.http.services
             Request request,
             string token)
         {
-            _logger?.LogInformation($"'{url}' invoked with PUT, '{request}' and Bearer token of '{token}'");
+            _logger?.Info($"'{url}' invoked with PUT, '{request}' and Bearer token of '{token}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Put,
@@ -190,7 +189,7 @@ namespace magic.http.services
             string url,
             Dictionary<string, string> headers = null)
         {
-            _logger?.LogInformation($"'{url}' invoked with GET");
+            _logger?.Info($"'{url}' invoked with GET");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Get,
@@ -208,7 +207,7 @@ namespace magic.http.services
             string url,
             string token)
         {
-            _logger?.LogInformation($"'{url}' invoked with GET and Bearer token of '{token}'");
+            _logger?.Info($"'{url}' invoked with GET and Bearer token of '{token}'");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Get,
@@ -229,7 +228,7 @@ namespace magic.http.services
             Action<Stream> functor,
             Dictionary<string, string> headers = null)
         {
-            _logger?.LogInformation($"'{url}' invoked with GET for Stream response");
+            _logger?.Info($"'{url}' invoked with GET for Stream response");
             await CreateEmptyRequestStreamResponse(
                 url,
                 net.HttpMethod.Get,
@@ -253,7 +252,7 @@ namespace magic.http.services
             Action<Stream> functor,
             string token)
         {
-            _logger?.LogInformation($"'{url}' invoked with GET and Bearer token of '{token}'");
+            _logger?.Info($"'{url}' invoked with GET and Bearer token of '{token}'");
             await CreateEmptyRequestStreamResponse(
                 url,
                 net.HttpMethod.Get,
@@ -272,7 +271,7 @@ namespace magic.http.services
             string url,
             Dictionary<string, string> headers = null)
         {
-            _logger?.LogInformation($"'{url}' invoked with DELETE");
+            _logger?.Info($"'{url}' invoked with DELETE");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Delete,
@@ -290,7 +289,7 @@ namespace magic.http.services
             string url,
             string token)
         {
-            _logger?.LogInformation($"'{url}' invoked with DELETE and Bearer token '{token}'");
+            _logger?.Info($"'{url}' invoked with DELETE and Bearer token '{token}'");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Delete,
@@ -390,7 +389,7 @@ namespace magic.http.services
                         if (!response.IsSuccessStatusCode)
                         {
                             var statusText = await content.ReadAsStringAsync();
-                            _logger?.LogError($"'{url}' invoked with '{method}' returned {response.StatusCode} and '{statusText}'");
+                            _logger?.Error($"'{url}' invoked with '{method}' returned {response.StatusCode} and '{statusText}'");
                             throw new HttpException(statusText, response.StatusCode);
                         }
 
