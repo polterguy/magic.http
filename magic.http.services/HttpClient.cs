@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using net = System.Net.Http;
 using Newtonsoft.Json.Linq;
 using magic.http.contracts;
+using System.Net.Http.Headers;
 
 namespace magic.http.services
 {
@@ -226,7 +227,7 @@ namespace magic.http.services
         /// <returns>Async void Task</returns>
         public async Task GetAsync(
             string url,
-            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
+            Action<Stream, HttpStatusCode, HttpResponseHeaders> functor,
             Dictionary<string, string> headers = null)
         {
             _logger?.Info($"'{url}' invoked with GET for Stream response");
@@ -250,7 +251,7 @@ namespace magic.http.services
         /// <returns>Async void Task</returns>
         public async Task GetAsync(
             string url,
-            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
+            Action<Stream, HttpStatusCode, HttpResponseHeaders> functor,
             string token)
         {
             _logger?.Info($"'{url}' invoked with GET and Bearer token of '{token}'");
@@ -377,7 +378,7 @@ namespace magic.http.services
         virtual protected async Task CreateEmptyRequestStreamResponse(
             string url,
             net.HttpMethod method,
-            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
+            Action<Stream, HttpStatusCode, HttpResponseHeaders> functor,
             Dictionary<string, string> headers)
         {
             using (var msg = CreateRequestMessage(method, url, headers))
@@ -387,20 +388,15 @@ namespace magic.http.services
                     using (var content = response.Content)
                     {
                         // Checking if request was successful, and if not, throwing an exception.
-                        var responseHeaders = new Dictionary<string, string>();
-                        foreach (var idx in response.Headers)
-                        {
-                            responseHeaders.Add(idx.Key, string.Join(";", idx.Value));
-                        }
                         if (!response.IsSuccessStatusCode)
                         {
                             var statusText = await content.ReadAsStringAsync();
                             _logger?.Error($"'{url}' invoked with '{method}' returned {response.StatusCode} and '{statusText}'");
-
+                            functor(await content.ReadAsStreamAsync(), response.StatusCode, response.Headers);
                         }
                         else
                         {
-                            functor(await content.ReadAsStreamAsync(), response.StatusCode, responseHeaders);
+                            functor(await content.ReadAsStreamAsync(), response.StatusCode, response.Headers);
                         }
                     }
                 }
@@ -423,13 +419,6 @@ namespace magic.http.services
             {
                 using (var content = response.Content)
                 {
-                    // Retrieving HTTP response headers.
-                    var responseHeaders = new Dictionary<string, string>();
-                    foreach (var idx in response.Headers)
-                    {
-                        responseHeaders.Add(idx.Key, string.Join(";", idx.Value));
-                    }
-
                     var responseContent = await content.ReadAsStringAsync();
 
                     // Checking is request was successful, and if not, throwing an exception.
@@ -439,7 +428,7 @@ namespace magic.http.services
                         {
                             Error = responseContent,
                             Status = response.StatusCode,
-                            Headers = responseHeaders,
+                            Headers = response.Headers,
                         };
                         return responseResult;
                     }
@@ -448,7 +437,7 @@ namespace magic.http.services
                         var responseResult = new Response<Response>
                         {
                             Status = response.StatusCode,
-                            Headers = responseHeaders,
+                            Headers = response.Headers,
                         };
 
                         // Checking if caller wants a string type of return

@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using System.Net.Http.Headers;
 using System.Collections.Generic;
 
 namespace magic.http.contracts
@@ -119,7 +120,7 @@ namespace magic.http.contracts
         /// <returns>Async void Task</returns>
         Task GetAsync(
             string url,
-            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
+            Action<Stream, HttpStatusCode, HttpResponseHeaders> functor,
             Dictionary<string, string> headers = null);
 
         /// <summary>
@@ -135,7 +136,7 @@ namespace magic.http.contracts
         /// <returns>Async void Task</returns>
         Task GetAsync(
             string url,
-            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
+            Action<Stream, HttpStatusCode, HttpResponseHeaders> functor,
             string token);
 
         /// <summary>
