@@ -31,6 +31,7 @@ namespace magic.http.tests
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
             var result = await client.GetAsync<string>("https://my-json-server.typicode.com/typicode/demo/posts");
             Assert.NotNull(result);
+            Assert.NotNull(result?.Content);
         }
 
         /*
@@ -43,7 +44,7 @@ namespace magic.http.tests
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
             var result = await client.GetAsync<JArray>("https://my-json-server.typicode.com/typicode/demo/posts");
             Assert.NotNull(result);
-            Assert.Equal(3, result.Count);
+            Assert.Equal(3, result.Content.Count);
         }
 
         /*
@@ -58,7 +59,7 @@ namespace magic.http.tests
                 "https://my-json-server.typicode.com/typicode/demo/posts",
                 new Dictionary<string, string> { { "Accept", "application/json" } });
             Assert.NotNull(result);
-            Assert.Equal(3, result.Length);
+            Assert.Equal(3, result.Content.Length);
         }
 
         /*
@@ -73,7 +74,7 @@ namespace magic.http.tests
                 "https://my-json-server.typicode.com/typicode/demo/posts",
                 "foo");
             Assert.NotNull(result);
-            Assert.Equal(3, result.Length);
+            Assert.Equal(3, result.Content.Length);
         }
 
         /*
@@ -102,7 +103,7 @@ namespace magic.http.tests
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
             var result = await client.GetAsync<IEnumerable<Blog>>("https://my-json-server.typicode.com/typicode/demo/posts");
             Assert.NotNull(result);
-            Assert.Equal(3, result.Count());
+            Assert.Equal(3, result.Content.Count());
         }
 
         /*
@@ -121,8 +122,8 @@ namespace magic.http.tests
             var result = await client.PostAsync<User, UserWithId>(
                 "https://my-json-server.typicode.com/typicode/demo/posts",
                 user);
-            Assert.Equal("John Doe", result.Name);
-            Assert.True(result.Id > 0);
+            Assert.Equal("John Doe", result.Content.Name);
+            Assert.True(result.Content.Id > 0);
         }
 
         /*
@@ -137,7 +138,7 @@ namespace magic.http.tests
             Blog[] blogs = null;
             await client.GetAsync(
                 "https://my-json-server.typicode.com/typicode/demo/posts",
-                (stream) =>
+                (stream, status, headers) =>
                 {
                     using (var memory = new MemoryStream())
                     {
@@ -175,8 +176,8 @@ namespace magic.http.tests
                     var result = await client.PostAsync<Stream, UserWithId>(
                         "https://my-json-server.typicode.com/typicode/demo/posts",
                         stream);
-                    Assert.Equal("John Doe", result.Name);
-                    Assert.True(result.Id > 0);
+                    Assert.Equal("John Doe", result.Content.Name);
+                    Assert.True(result.Content.Id > 0);
                 }
             }
         }

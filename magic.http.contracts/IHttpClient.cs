@@ -6,6 +6,7 @@
 
 using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -31,7 +32,7 @@ namespace magic.http.contracts
         /// <param name="request">Payload of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response> PostAsync<Request, Response>(
+        Task<Response<Response>> PostAsync<Request, Response>(
             string url,
             Request request,
             Dictionary<string, string> headers = null);
@@ -47,7 +48,7 @@ namespace magic.http.contracts
         /// <param name="request">Payload of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response> PostAsync<Request, Response>(
+        Task<Response<Response>> PostAsync<Request, Response>(
             string url,
             Request request,
             string token);
@@ -63,7 +64,7 @@ namespace magic.http.contracts
         /// <param name="request">Payload of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response> PutAsync<Request, Response>(
+        Task<Response<Response>> PutAsync<Request, Response>(
             string url,
             Request request,
             Dictionary<string, string> headers = null);
@@ -79,7 +80,7 @@ namespace magic.http.contracts
         /// <param name="request">Payload of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response> PutAsync<Request, Response>(
+        Task<Response<Response>> PutAsync<Request, Response>(
             string url,
             Request request,
             string token);
@@ -91,7 +92,7 @@ namespace magic.http.contracts
         /// <param name="url">URL of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response> GetAsync<Response>(
+        Task<Response<Response>> GetAsync<Response>(
             string url,
             Dictionary<string, string> headers = null);
 
@@ -102,7 +103,7 @@ namespace magic.http.contracts
         /// <param name="url">URL of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response> GetAsync<Response>(
+        Task<Response<Response>> GetAsync<Response>(
             string url,
             string token);
 
@@ -118,7 +119,7 @@ namespace magic.http.contracts
         /// <returns>Async void Task</returns>
         Task GetAsync(
             string url,
-            Action<Stream> functor,
+            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
             Dictionary<string, string> headers = null);
 
         /// <summary>
@@ -134,7 +135,7 @@ namespace magic.http.contracts
         /// <returns>Async void Task</returns>
         Task GetAsync(
             string url,
-            Action<Stream> functor,
+            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
             string token);
 
         /// <summary>
@@ -144,7 +145,7 @@ namespace magic.http.contracts
         /// <param name="url">URL of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Result of your request.</returns>
-        Task<Response> DeleteAsync<Response>(
+        Task<Response<Response>> DeleteAsync<Response>(
             string url,
             Dictionary<string, string> headers = null);
 
@@ -155,7 +156,7 @@ namespace magic.http.contracts
         /// <param name="url">URL of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Result of your request.</returns>
-        Task<Response> DeleteAsync<Response>(
+        Task<Response<Response>> DeleteAsync<Response>(
             string url,
             string token);
     }

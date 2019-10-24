@@ -6,6 +6,7 @@
 
 using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using net = System.Net.Http;
@@ -92,7 +93,7 @@ namespace magic.http.services
         /// <param name="request">Payload of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        public async Task<Response> PostAsync<Request, Response>(
+        public async Task<Response<Response>> PostAsync<Request, Response>(
             string url,
             Request request,
             Dictionary<string, string> headers = null)
@@ -116,7 +117,7 @@ namespace magic.http.services
         /// <param name="request">Payload of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        public async Task<Response> PostAsync<Request, Response>(
+        public async Task<Response<Response>> PostAsync<Request, Response>(
             string url,
             Request request,
             string token)
@@ -141,7 +142,7 @@ namespace magic.http.services
         /// <param name="request">Payload of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        public async Task<Response> PutAsync<Request, Response>(
+        public async Task<Response<Response>> PutAsync<Request, Response>(
             string url,
             Request request,
             Dictionary<string, string> headers = null)
@@ -165,7 +166,7 @@ namespace magic.http.services
         /// <param name="request">Payload of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        public async Task<Response> PutAsync<Request, Response>(
+        public async Task<Response<Response>> PutAsync<Request, Response>(
             string url,
             Request request,
             string token)
@@ -185,7 +186,7 @@ namespace magic.http.services
         /// <param name="url">URL of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        public async Task<Response> GetAsync<Response>(
+        public async Task<Response<Response>> GetAsync<Response>(
             string url,
             Dictionary<string, string> headers = null)
         {
@@ -203,7 +204,7 @@ namespace magic.http.services
         /// <param name="url">URL of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        public async Task<Response> GetAsync<Response>(
+        public async Task<Response<Response>> GetAsync<Response>(
             string url,
             string token)
         {
@@ -225,7 +226,7 @@ namespace magic.http.services
         /// <returns>Async void Task</returns>
         public async Task GetAsync(
             string url,
-            Action<Stream> functor,
+            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
             Dictionary<string, string> headers = null)
         {
             _logger?.Info($"'{url}' invoked with GET for Stream response");
@@ -249,7 +250,7 @@ namespace magic.http.services
         /// <returns>Async void Task</returns>
         public async Task GetAsync(
             string url,
-            Action<Stream> functor,
+            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
             string token)
         {
             _logger?.Info($"'{url}' invoked with GET and Bearer token of '{token}'");
@@ -267,7 +268,7 @@ namespace magic.http.services
         /// <param name="url">URL of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Result of your request.</returns>
-        public async Task<Response> DeleteAsync<Response>(
+        public async Task<Response<Response>> DeleteAsync<Response>(
             string url,
             Dictionary<string, string> headers = null)
         {
@@ -285,7 +286,7 @@ namespace magic.http.services
         /// <param name="url">URL of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Result of your request.</returns>
-        public async Task<Response> DeleteAsync<Response>(
+        public async Task<Response<Response>> DeleteAsync<Response>(
             string url,
             string token)
         {
@@ -310,7 +311,7 @@ namespace magic.http.services
         /// <param name="method">HTTP method or verb to create your request as.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        virtual protected async Task<Response> CreateEmptyRequest<Response>(
+        virtual protected async Task<Response<Response>> CreateEmptyRequest<Response>(
             string url,
             net.HttpMethod method,
             Dictionary<string, string> headers)
@@ -331,7 +332,7 @@ namespace magic.http.services
         /// <param name="input">Payload for your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        virtual protected async Task<Response> CreateContentRequest<Response>(
+        virtual protected async Task<Response<Response>> CreateContentRequest<Response>(
             string url,
             net.HttpMethod method,
             object input,
@@ -376,7 +377,7 @@ namespace magic.http.services
         virtual protected async Task CreateEmptyRequestStreamResponse(
             string url,
             net.HttpMethod method,
-            Action<Stream> functor,
+            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
             Dictionary<string, string> headers)
         {
             using (var msg = CreateRequestMessage(method, url, headers))
@@ -386,14 +387,21 @@ namespace magic.http.services
                     using (var content = response.Content)
                     {
                         // Checking if request was successful, and if not, throwing an exception.
+                        var responseHeaders = new Dictionary<string, string>();
+                        foreach (var idx in response.Headers)
+                        {
+                            responseHeaders.Add(idx.Key, string.Join(";", idx.Value));
+                        }
                         if (!response.IsSuccessStatusCode)
                         {
                             var statusText = await content.ReadAsStringAsync();
                             _logger?.Error($"'{url}' invoked with '{method}' returned {response.StatusCode} and '{statusText}'");
-                            throw new HttpException(statusText, response.StatusCode);
-                        }
 
-                        functor(await content.ReadAsStreamAsync());
+                        }
+                        else
+                        {
+                            functor(await content.ReadAsStreamAsync(), response.StatusCode, responseHeaders);
+                        }
                     }
                 }
             }
@@ -407,7 +415,7 @@ namespace magic.http.services
         /// <param name="url">URL for your request.</param>
         /// <param name="msg">HTTP request message.</param>
         /// <returns>Object returned from your request.</returns>
-        virtual protected async Task<Response> GetResult<Response>(
+        virtual protected async Task<Response<Response>> GetResult<Response>(
             string url,
             net.HttpRequestMessage msg)
         {
@@ -415,42 +423,74 @@ namespace magic.http.services
             {
                 using (var content = response.Content)
                 {
+                    // Retrieving HTTP response headers.
+                    var responseHeaders = new Dictionary<string, string>();
+                    foreach (var idx in response.Headers)
+                    {
+                        responseHeaders.Add(idx.Key, string.Join(";", idx.Value));
+                    }
+
                     var responseContent = await content.ReadAsStringAsync();
 
                     // Checking is request was successful, and if not, throwing an exception.
                     if (!response.IsSuccessStatusCode)
-                        throw new HttpException(responseContent, response.StatusCode);
+                    {
+                        var responseResult = new Response<Response>
+                        {
+                            Error = responseContent,
+                            Status = response.StatusCode,
+                            Headers = responseHeaders,
+                        };
+                        return responseResult;
+                    }
+                    else
+                    {
+                        var responseResult = new Response<Response>
+                        {
+                            Status = response.StatusCode,
+                            Headers = responseHeaders,
+                        };
 
-                    // Checking if caller wants a string type of return
-                    if (typeof(Response) == typeof(string))
-                        return (Response)(object)responseContent;
+                        // Checking if caller wants a string type of return
+                        if (typeof(Response) == typeof(string))
+                        {
+                            responseResult.Content = (Response)(object)responseContent;
+                        }
+                        else if (typeof(IConvertible).IsAssignableFrom(typeof(Response)))
+                        {
+                            /*
+                             * Checking if Response type implements IConvertible, at which point
+                             * we simply converts the response instead of parsing it using
+                             * JSON conversion.
+                             *
+                             * This might be used if caller is requesting for instance
+                             * an integer, or some other object that has automatic conversion
+                             * from string to itself.
+                             */
+                            responseResult.Content = (Response)Convert.ChangeType(responseContent, typeof(Response));
+                        }
+                        else
+                        {
 
-                    /*
-                     * Checking if Response type implements IConvertible, at which point
-                     * we simply converts the response instead of parsing it using
-                     * JSON conversion.
-                     *
-                     * This might be used if caller is requesting for instance
-                     * an integer, or some other object that has automatic conversion
-                     * from string to itself.
-                     */
-                    if (typeof(IConvertible).IsAssignableFrom(typeof(Response)))
-                        return (Response)Convert.ChangeType(responseContent, typeof(Response));
+                            /*
+                             * Checking if caller is interested in some sort of JContainer,
+                             * such as a JArray or JObject, at which point we simply return
+                             * the above object immediately as such.
+                             */
+                            var objResult = JToken.Parse(responseContent);
+                            if (typeof(Response) == typeof(JContainer))
+                                responseResult.Content = (Response)(object)objResult;
 
-                    /*
-                     * Checking if caller is interested in some sort of JContainer,
-                     * such as a JArray or JObject, at which point we simply return
-                     * the above object immediately as such.
-                     */
-                    var objResult = JToken.Parse(responseContent);
-                    if (typeof(Response) == typeof(JContainer))
-                        return (Response)(object)objResult;
+                            /*
+                             * Converting above JContainer to instance of requested type,
+                             * and returns object to caller.
+                             */
+                            responseResult.Content = objResult.ToObject<Response>();
+                        }
 
-                    /*
-                     * Converting above JContainer to instance of requested type,
-                     * and returns object to caller.
-                     */
-                    return objResult.ToObject<Response>();
+                        // Finally, we can return result to caller.
+                        return responseResult;
+                    }
                 }
             }
         }
