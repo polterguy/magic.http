@@ -5,7 +5,7 @@
  */
 
 using System.Net;
-using System.Net.Http.Headers;
+using System.Collections.Generic;
 
 namespace magic.http.contracts
 {
@@ -22,7 +22,7 @@ namespace magic.http.contracts
         /// <summary>
         /// HTTP heders for the response.
         /// </summary>
-        public HttpResponseHeaders Headers { get; set; }
+        public Dictionary<string, string> Headers { get; set; }
 
         /// <summary>
         /// Actual status response code for the request.

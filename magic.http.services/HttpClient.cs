@@ -227,7 +227,7 @@ namespace magic.http.services
         /// <returns>Async void Task</returns>
         public async Task GetAsync(
             string url,
-            Action<Stream, HttpStatusCode, HttpResponseHeaders> functor,
+            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
             Dictionary<string, string> headers = null)
         {
             _logger?.Info($"'{url}' invoked with GET for Stream response");
@@ -251,7 +251,7 @@ namespace magic.http.services
         /// <returns>Async void Task</returns>
         public async Task GetAsync(
             string url,
-            Action<Stream, HttpStatusCode, HttpResponseHeaders> functor,
+            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
             string token)
         {
             _logger?.Info($"'{url}' invoked with GET and Bearer token of '{token}'");
@@ -378,7 +378,7 @@ namespace magic.http.services
         virtual protected async Task CreateEmptyRequestStreamResponse(
             string url,
             net.HttpMethod method,
-            Action<Stream, HttpStatusCode, HttpResponseHeaders> functor,
+            Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
             Dictionary<string, string> headers)
         {
             using (var msg = CreateRequestMessage(method, url, headers))
@@ -387,16 +387,19 @@ namespace magic.http.services
                 {
                     using (var content = response.Content)
                     {
+                        // Retrieving HTTP headers, both response and content headers.
+                        var responseHeaders = GetHeaders(response, content);
+
                         // Checking if request was successful, and if not, throwing an exception.
                         if (!response.IsSuccessStatusCode)
                         {
                             var statusText = await content.ReadAsStringAsync();
                             _logger?.Error($"'{url}' invoked with '{method}' returned {response.StatusCode} and '{statusText}'");
-                            functor(await content.ReadAsStreamAsync(), response.StatusCode, response.Headers);
+                            functor(await content.ReadAsStreamAsync(), response.StatusCode, responseHeaders);
                         }
                         else
                         {
-                            functor(await content.ReadAsStreamAsync(), response.StatusCode, response.Headers);
+                            functor(await content.ReadAsStreamAsync(), response.StatusCode, responseHeaders);
                         }
                     }
                 }
@@ -419,6 +422,10 @@ namespace magic.http.services
             {
                 using (var content = response.Content)
                 {
+                    // Retrieving HTTP headers, both response and content headers.
+                    var responseHeaders = GetHeaders(response, content);
+
+                    // Retrieving actual content.
                     var responseContent = await content.ReadAsStringAsync();
 
                     // Checking is request was successful, and if not, throwing an exception.
@@ -428,7 +435,7 @@ namespace magic.http.services
                         {
                             Error = responseContent,
                             Status = response.StatusCode,
-                            Headers = response.Headers,
+                            Headers = responseHeaders,
                         };
                         return responseResult;
                     }
@@ -437,7 +444,7 @@ namespace magic.http.services
                         var responseResult = new Response<Response>
                         {
                             Status = response.StatusCode,
-                            Headers = response.Headers,
+                            Headers = responseHeaders,
                         };
 
                         // Checking if caller wants a string type of return
@@ -576,6 +583,21 @@ namespace magic.http.services
                     { "Content-Type", "application/json" },
                     { "Authorization", "Bearer " + (token ?? throw new ArgumentNullException(nameof(token))) },
             };
+        }
+
+        Dictionary<string, string> GetHeaders(net.HttpResponseMessage response, net.HttpContent content)
+        {
+            var headers = new Dictionary<string, string>();
+            foreach (var idx in response.Headers)
+            {
+                headers.Add(idx.Key, string.Join(";", idx.Value));
+            }
+            foreach (var idx in content.Headers)
+            {
+                headers.Add(idx.Key, string.Join(";", idx.Value));
+            }
+
+            return headers;
         }
 
         #endregion
