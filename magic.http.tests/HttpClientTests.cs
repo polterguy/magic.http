@@ -1,3 +1,4 @@
+//#define DEEP_TESTING
 /*
  * Magic, Copyright(c) Thomas Hansen 2019 - 2020, thomas@servergardens.com, all rights reserved.
  * See the enclosed LICENSE file for details.
@@ -15,11 +16,13 @@ using Newtonsoft.Json.Linq;
 using magic.http.services;
 using magic.http.contracts;
 
+#if DEEP_TESTING
+
 namespace magic.http.tests
 {
     public class HttpClientTests
     {
-        #region [ -- Unit tests -- ]
+#region [ -- Unit tests -- ]
 
         /*
          * Checks that we can return a simple string from an HTTP GET request.
@@ -182,9 +185,9 @@ namespace magic.http.tests
             }
         }
 
-        #endregion
+#endregion
 
-        #region [ -- Private helper methods and types -- ]
+#region [ -- Private helper methods and types -- ]
 
         class Blog
         {
@@ -215,6 +218,8 @@ namespace magic.http.tests
             return provider;
         }
 
-        #endregion
+#endregion
     }
 }
+
+#endif
