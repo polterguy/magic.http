@@ -38,8 +38,6 @@ namespace magic.http.services
                 { "Accept", "application/json" },
             };
 
-        readonly ILogger _logger;
-
         /// <summary>
         /// Creates a new instance of your HttpClient without logging, using a
         /// static single .Net HttpClient.
@@ -48,35 +46,12 @@ namespace magic.http.services
         { }
 
         /// <summary>
-        /// Creates a new instance of your HttpClient with the specified logger
-        /// using a single static .Net HttpClient.
-        /// </summary>
-        /// <param name="logger">Logger to log every request and errors to.</param>
-        public HttpClient(ILogger logger)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        /// <summary>
         /// Creates a new instance of your HttpClient with the specified HttpClient
         /// factory function and no logging.
         /// </summary>
         /// <param name="factory"></param>
         public HttpClient(Func<string, net.HttpClient> factory)
         {
-            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
-        }
-
-        /// <summary>
-        /// Creates a new instance of your HttpClient with the specified HttpClient
-        /// factory function, and the specified logger.
-        /// </summary>
-        /// <param name="logger">Logger to log every request and errors to</param>
-        /// <param name="factory">Factory function to use to create .Net HttpClient
-        /// instances from.</param>
-        public HttpClient(ILogger logger, Func<string, net.HttpClient> factory)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
@@ -99,7 +74,6 @@ namespace magic.http.services
             Request request,
             Dictionary<string, string> headers = null)
         {
-            _logger?.Info($"'{url}' invoked with POST and '{request}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Post,
@@ -123,7 +97,6 @@ namespace magic.http.services
             Request request,
             string token)
         {
-            _logger?.Info($"'{url}' invoked with POST, '{request}' and Bearer token of '{token}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Post,
@@ -148,7 +121,6 @@ namespace magic.http.services
             Request request,
             Dictionary<string, string> headers = null)
         {
-            _logger?.Info($"'{url}' invoked with PUT and '{request}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Put,
@@ -172,7 +144,6 @@ namespace magic.http.services
             Request request,
             string token)
         {
-            _logger?.Info($"'{url}' invoked with PUT, '{request}' and Bearer token of '{token}'");
             return await CreateContentRequest<Response>(
                 url,
                 net.HttpMethod.Put,
@@ -191,7 +162,6 @@ namespace magic.http.services
             string url,
             Dictionary<string, string> headers = null)
         {
-            _logger?.Info($"'{url}' invoked with GET");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Get,
@@ -209,7 +179,6 @@ namespace magic.http.services
             string url,
             string token)
         {
-            _logger?.Info($"'{url}' invoked with GET and Bearer token of '{token}'");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Get,
@@ -230,7 +199,6 @@ namespace magic.http.services
             Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
             Dictionary<string, string> headers = null)
         {
-            _logger?.Info($"'{url}' invoked with GET for Stream response");
             await CreateEmptyRequestStreamResponse(
                 url,
                 net.HttpMethod.Get,
@@ -254,7 +222,6 @@ namespace magic.http.services
             Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
             string token)
         {
-            _logger?.Info($"'{url}' invoked with GET and Bearer token of '{token}'");
             await CreateEmptyRequestStreamResponse(
                 url,
                 net.HttpMethod.Get,
@@ -273,7 +240,6 @@ namespace magic.http.services
             string url,
             Dictionary<string, string> headers = null)
         {
-            _logger?.Info($"'{url}' invoked with DELETE");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Delete,
@@ -291,7 +257,6 @@ namespace magic.http.services
             string url,
             string token)
         {
-            _logger?.Info($"'{url}' invoked with DELETE and Bearer token '{token}'");
             return await CreateEmptyRequest<Response>(
                 url,
                 net.HttpMethod.Delete,
@@ -394,7 +359,6 @@ namespace magic.http.services
                         if (!response.IsSuccessStatusCode)
                         {
                             var statusText = await content.ReadAsStringAsync();
-                            _logger?.Error($"'{url}' invoked with '{method}' returned {response.StatusCode} and '{statusText}'");
                             functor(await content.ReadAsStreamAsync(), response.StatusCode, responseHeaders);
                         }
                         else
