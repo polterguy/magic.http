@@ -358,7 +358,6 @@ namespace magic.http.services
                         // Checking if request was successful, and if not, throwing an exception.
                         if (!response.IsSuccessStatusCode)
                         {
-                            var statusText = await content.ReadAsStringAsync();
                             functor(await content.ReadAsStreamAsync(), response.StatusCode, responseHeaders);
                         }
                         else
