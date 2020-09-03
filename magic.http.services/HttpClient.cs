@@ -356,14 +356,7 @@ namespace magic.http.services
                         var responseHeaders = GetHeaders(response, content);
 
                         // Checking if request was successful, and if not, throwing an exception.
-                        if (!response.IsSuccessStatusCode)
-                        {
-                            functor(await content.ReadAsStreamAsync(), response.StatusCode, responseHeaders);
-                        }
-                        else
-                        {
-                            functor(await content.ReadAsStreamAsync(), response.StatusCode, responseHeaders);
-                        }
+                        functor(await content.ReadAsStreamAsync(), response.StatusCode, responseHeaders);
                     }
                 }
             }
