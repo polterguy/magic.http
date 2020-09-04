@@ -52,7 +52,7 @@ namespace magic.http.services
         /// <param name="factory"></param>
         public HttpClient(Func<string, net.HttpClient> factory)
         {
-            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            _factory = factory;
         }
 
         #region [ -- Interface implementation -- ]
