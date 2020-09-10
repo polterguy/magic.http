@@ -16,8 +16,6 @@ using Newtonsoft.Json.Linq;
 using magic.http.services;
 using magic.http.contracts;
 
-#if DEEP_TESTING
-
 namespace magic.http.tests
 {
     public class HttpClientTests
@@ -221,5 +219,3 @@ namespace magic.http.tests
 #endregion
     }
 }
-
-#endif
