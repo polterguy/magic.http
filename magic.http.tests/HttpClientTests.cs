@@ -141,16 +141,12 @@ namespace magic.http.tests
                 "https://my-json-server.typicode.com/typicode/demo/posts",
                 (stream, status, headers) =>
                 {
-                    using (var memory = new MemoryStream())
-                    {
-                        stream.CopyTo(memory);
-                        memory.Position = 0;
-                        using (var reader = new StreamReader(memory))
-                        {
-                            var stringContent = reader.ReadToEnd();
-                            blogs = JArray.Parse(stringContent).ToObject<Blog[]>();
-                        }
-                    }
+                    using var memory = new MemoryStream();
+                    stream.CopyTo(memory);
+                    memory.Position = 0;
+                    using var reader = new StreamReader(memory);
+                    var stringContent = reader.ReadToEnd();
+                    blogs = JArray.Parse(stringContent).ToObject<Blog[]>();
                 });
             Assert.Equal(3, blogs.Length);
         }
@@ -163,24 +159,20 @@ namespace magic.http.tests
         {
             var kernel = Initialize();
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
-            using (var stream = new MemoryStream())
+            using var stream = new MemoryStream();
+            var jObject = JObject.FromObject(new User
             {
-                var jObject = JObject.FromObject(new User
-                {
-                    Name = "John Doe"
-                });
-                using (var writer = new StreamWriter(stream))
-                {
-                    writer.Write (jObject);
-                    writer.Flush();
-                    stream.Position = 0;
-                    var result = await client.PostAsync<Stream, UserWithId>(
-                        "https://my-json-server.typicode.com/typicode/demo/posts",
-                        stream);
-                    Assert.Equal("John Doe", result.Content.Name);
-                    Assert.True(result.Content.Id > 0);
-                }
-            }
+                Name = "John Doe"
+            });
+            using var writer = new StreamWriter(stream);
+            writer.Write(jObject);
+            writer.Flush();
+            stream.Position = 0;
+            var result = await client.PostAsync<Stream, UserWithId>(
+                "https://my-json-server.typicode.com/typicode/demo/posts",
+                stream);
+            Assert.Equal("John Doe", result.Content.Name);
+            Assert.True(result.Content.Id > 0);
         }
 
 #endregion
