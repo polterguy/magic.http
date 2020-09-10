@@ -45,9 +45,16 @@ namespace magic.http.tests
         {
             var kernel = Initialize((url) => new net.HttpClient());
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
-            var result = await client.GetAsync<string>("https://my-json-server.typicode.com/typicode/demo/posts");
+            string result = null;
+            await client
+                .GetAsync(
+                "https://my-json-server.typicode.com/typicode/demo/posts",
+                (stream, status, headers) => {
+                    result = new StreamReader(stream).ReadToEnd();
+                    Assert.Equal(HttpStatusCode.OK, status);
+                    Assert.NotEmpty(headers);
+                });
             Assert.NotNull(result);
-            Assert.NotNull(result?.Content);
         }
 
         /*
@@ -120,6 +127,30 @@ namespace magic.http.tests
             var result = await client.GetAsync<IEnumerable<Blog>>("https://my-json-server.typicode.com/typicode/demo/posts");
             Assert.NotNull(result);
             Assert.Equal(3, result.Content.Count());
+        }
+
+        /*
+         * Checks that we can return a simple string from an HTTP GET request.
+         */
+        [Fact]
+        public async Task Delete()
+        {
+            var kernel = Initialize();
+            var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
+            var result = await client.DeleteAsync<string>("https://my-json-server.typicode.com/typicode/demo/posts");
+            Assert.Equal(HttpStatusCode.NotFound, result.Status);
+        }
+
+        /*
+         * Checks that we can return a simple string from an HTTP GET request.
+         */
+        [Fact]
+        public async Task DeleteWithToken()
+        {
+            var kernel = Initialize();
+            var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
+            var result = await client.DeleteAsync<string>("https://my-json-server.typicode.com/typicode/demo/posts", "xyz");
+            Assert.Equal(HttpStatusCode.NotFound, result.Status);
         }
 
         /*
