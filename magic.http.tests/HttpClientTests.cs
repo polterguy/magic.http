@@ -6,9 +6,11 @@
 
 using System;
 using System.IO;
+using System.Net;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using net = System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -29,6 +31,19 @@ namespace magic.http.tests
         public async Task GetString()
         {
             var kernel = Initialize();
+            var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
+            var result = await client.GetAsync<string>("https://my-json-server.typicode.com/typicode/demo/posts");
+            Assert.NotNull(result);
+            Assert.NotNull(result?.Content);
+        }
+
+        /*
+         * Checks that we can return a simple string from an HTTP GET request.
+         */
+        [Fact]
+        public async Task GetStringWithFunc()
+        {
+            var kernel = Initialize((url) => new net.HttpClient());
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
             var result = await client.GetAsync<string>("https://my-json-server.typicode.com/typicode/demo/posts");
             Assert.NotNull(result);
@@ -128,6 +143,68 @@ namespace magic.http.tests
         }
 
         /*
+         * Verifies that we can send and return a typed object using HTTP POST
+         * as both request payload and response payload.
+         */
+        [Fact]
+        public async Task PostObjectWithToken()
+        {
+            var kernel = Initialize();
+            var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
+            var user = new User
+            {
+                Name = "John Doe"
+            };
+            var result = await client.PostAsync<User, UserWithId>(
+                "https://my-json-server.typicode.com/typicode/demo/posts",
+                user,
+                "xxyyzz");
+            Assert.Equal("John Doe", result.Content.Name);
+            Assert.True(result.Content.Id > 0);
+        }
+
+        /*
+         * Verifies that we can send and return a typed object using HTTP POST
+         * as both request payload and response payload.
+         */
+        [Fact]
+        public async Task PutObject()
+        {
+            var kernel = Initialize();
+            var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
+            var user = new Blog
+            {
+                Title = "Howdy World",
+                Id = 119
+            };
+            var result = await client.PutAsync<Blog, string>(
+                "https://my-json-server.typicode.com/typicode/demo/posts",
+                user);
+            Assert.Equal(HttpStatusCode.NotFound, result.Status);
+        }
+
+        /*
+         * Verifies that we can send and return a typed object using HTTP POST
+         * as both request payload and response payload.
+         */
+        [Fact]
+        public async Task PutObjectWithToken()
+        {
+            var kernel = Initialize();
+            var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
+            var user = new Blog
+            {
+                Title = "Foo Bar Hello",
+                Id = 119
+            };
+            var result = await client.PutAsync<Blog, string>(
+                "https://my-json-server.typicode.com/typicode/demo/posts",
+                user,
+                "xxyyzz");
+            Assert.Equal(HttpStatusCode.NotFound, result.Status);
+        }
+
+        /*
          * Verifies that we can return the HTTP response stream directly using
          * a lambda callback for HTTP GET requests.
          */
@@ -198,12 +275,15 @@ namespace magic.http.tests
             public string Name { get; set; }
         }
 
-        IServiceProvider Initialize()
+        IServiceProvider Initialize(Func<string, net.HttpClient> functor = null)
         {
             var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
             services.AddTransient<IConfiguration>((svc) => configuration);
-            services.AddTransient<IHttpClient, HttpClient>();
+            if (functor != null)
+                services.AddTransient<IHttpClient>(svc => new HttpClient(url => new net.HttpClient()));
+            else
+                services.AddTransient<IHttpClient, HttpClient>();
             var provider = services.BuildServiceProvider();
             return provider;
         }
