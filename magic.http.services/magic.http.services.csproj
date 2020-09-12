@@ -10,7 +10,7 @@
     <Description>A minimalistic HTTP REST library, wrapping HttpClient, giving you strongly types, and method invocations, making HTTP REST invocations almost as easy as invoking local methods and functions, with a single line of code.</Description>
     <PackageProjectUrl>https://github.com/polterguy/magic.http</PackageProjectUrl>
     <PackOnBuild>true</PackOnBuild>
-    <PackageVersion>8.1.11</PackageVersion>
+    <PackageVersion>8.1.15</PackageVersion>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/polterguy/magic.http.git</RepositoryUrl>
