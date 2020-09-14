@@ -1,7 +1,7 @@
 
 # Magic HTTP for .Net
 
-[![Build status](https://travis-ci.org/polterguy/magic.http.svg?master)](https://travis-ci.org/polterguy/magic.http)
+[![Build status](https://travis-ci.com/polterguy/magic.http.svg?master)](https://travis-ci.com/polterguy/magic.http)
 
 An _"opinionated"_, minimalistic, and super simple HTTP REST library for .Net built on .Net Standard. The whole idea
 with the library, is to provide a single line invocation for HTTP REST invocations from C# and other CLR languages.
