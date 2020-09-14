@@ -88,3 +88,18 @@ The `HttpClient` implementation class, also provides multiple CTORs, allowing yo
 a _"factory function"_ for creating .Net `HttpClient` instances, which allows you to use among other things
 the `IHttpClientFactory` in .Net Core projects, without bringing in dependencies upon it, which would break
 .Net Framework compatibility.
+
+## Quality gates
+
+- [![Build status](https://travis-ci.com/polterguy/magic.http.svg?master)](https://travis-ci.com/polterguy/magic.http)
+- [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=alert_status)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+- [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=bugs)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+- [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=code_smells)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+- [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=coverage)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+- [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+- [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=ncloc)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+- [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+- [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+- [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=security_rating)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+- [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=sqale_index)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+- [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
