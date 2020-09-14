@@ -1,5 +1,5 @@
 
-# Magic HTTP for .Net
+# Magic HTTP
 
 [![Build status](https://travis-ci.com/polterguy/magic.http.svg?master)](https://travis-ci.com/polterguy/magic.http)
 
