@@ -89,8 +89,6 @@ a _"factory function"_ for creating .Net `HttpClient` instances, which allows yo
 the `IHttpClientFactory` in .Net Core projects, without bringing in dependencies upon it, which would break
 .Net Framework compatibility.
 
-* [Main documentation](https://polterguy.github.io/)
-
 ## Quality gates
 
 - [![Build status](https://travis-ci.com/polterguy/magic.http.svg?master)](https://travis-ci.com/polterguy/magic.http)
