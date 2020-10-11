@@ -75,14 +75,11 @@ for then to retrieve instances to its implementation using dependency injection 
 services.AddTransient<IHttpClient, HttpClient>();
 ```
 
-Most methods in its `HttpClient` implementation class is also virtual, allowing you to extend the base `HttpClient`
-implementation, by inheriting from its base class, and override whatever method you simply must change for some reasons.
-
 However, the library is first and foremost created to support JSON and/or large files as payloads and response values,
 and the _"philosophy"_ of the library is to allow you to create HTTP REST requests with a _single line of code_, to
-such facilitate for simplified code, and great cohesion in your own code. The library will not support every single
+such facilitate for simplified code, and better cohesion in your own code. The library will not support every single
 permutation of HTTP requests possible to create, due to that this would complicate its code, and results in that it
-degradates over time.
+degrades over time.
 
 ## Quality gates
 
