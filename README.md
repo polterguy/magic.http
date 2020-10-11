@@ -8,13 +8,15 @@ that are automatically serialized to JSON, and return types from your endpoints,
 Below you can see an example of usage.
 
 ```csharp
-var result = await client.GetAsync<Blog[]>("https://my-json-server.typicode.com/typicode/demo/posts");
+var result = await client.GetAsync<Post[]>("https://foo-bar.com/posts");
 ```
 
 The idea is that you provide your request type (if any), and your response type as generic arguments to its
 `IHttpClient` interface methods, and the library will perform automatic conversion on your behalf, reducing your
-HTTP REST invocations to a single line of code, resembling _"normal method invocations"_. This provides an
-extremely simply to use API, and also allows you to have large amount of cohesion in your own code.
+HTTP REST invocations to a single line of code, resembling _"function invocations"_. This provides an
+extremely simply to use API, and also allows you to have large amount of cohesion in your own code. After all,
+HTTP is a request/response type of model, arguably much more suited for _"functional style"_ of programming,
+than Object Oriented programming.
 
 The library supports the 4 most commonly HTTP verbs, below is a list.
 
