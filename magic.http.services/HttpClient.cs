@@ -175,7 +175,7 @@ namespace magic.http.services
         {
             using (var msg = CreateRequestMessage(method, url, headers))
             {
-                return await GetResult<Response>(url, msg);
+                return await GetResult<Response>(msg);
             }
         }
 
@@ -196,7 +196,7 @@ namespace magic.http.services
                     {
                         AddContentHeaders(content, headers);
                         msg.Content = content;
-                        return await GetResult<Response>(url, msg);
+                        return await GetResult<Response>(msg);
                     }
                 }
 
@@ -208,7 +208,7 @@ namespace magic.http.services
                 {
                     AddContentHeaders(content, headers);
                     msg.Content = content;
-                    return await GetResult<Response>(url, msg);
+                    return await GetResult<Response>(msg);
                 }
             }
         }
@@ -243,7 +243,6 @@ namespace magic.http.services
          * Only invoked if you are requesting a non Stream result.
          */
         async Task<Response<Response>> GetResult<Response>(
-            string url,
             net.HttpRequestMessage msg)
         {
             using (var response = await _client.SendAsync(msg))
