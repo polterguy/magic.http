@@ -19,7 +19,7 @@ namespace magic.http.services
     /// Service implementation for IHttpClient. Uses System.Net.Http.HttpClient
     /// internally to invoke your HTTP requests.
     /// </summary>
-    public sealed class HttpClient : IHttpClient
+    public sealed class HttpClient : IHttpClient, IDisposable
     {
         readonly net.HttpClient _client;
 
@@ -167,6 +167,14 @@ namespace magic.http.services
                 url,
                 net.HttpMethod.Delete,
                 GetDefaultBearerTokenHeaders(token));
+        }
+
+        /// <summary>
+        /// Necessary to dispose HttpClient used internally
+        /// </summary>
+        public void Dispose()
+        {
+            _client.Dispose();
         }
 
         #endregion

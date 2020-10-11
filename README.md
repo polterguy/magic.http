@@ -85,7 +85,11 @@ However, the library is first and foremost created to support JSON and/or large 
 and the _"philosophy"_ of the library is to allow you to create HTTP REST requests with a _single line of code_, to
 such facilitate for simplified code, and better cohesion in your own code. The library will not support every single
 permutation of HTTP requests possible to create, due to that this would complicate its code, and results in that it
-degrades over time.
+degrades over time. The library is created to eliminate an entire axiom of bugs related to wrong usage of HttpClient.
+You can read some of its rational below.
+
+1. [HttpClient is fundamentally broken](https://dzone.com/articles/nets-httpclient-is-a-hot-smoking-pile-of-garbage)
+2. [Salvaging HttpClient](https://dzone.com/articles/salvaging-nets-httpclient)
 
 ## Quality gates
 
