@@ -73,7 +73,13 @@ for then to retrieve instances to its implementation using dependency injection 
  * Somewhere where you wire up your IoC provider.
  */
 services.AddTransient<IHttpClient, HttpClient>();
+services.AddHttpClient();
 ```
+
+The last part is important to make sure you register the `IHttpClientFactory` required to create
+instances of `HttpClient` to use internally in the library. Magic will use _"magic"_ as a named
+instance as it creates its HttpClient, allowing you to fiddle with configuring it as you see fit,
+for advanced usage. Just remember that _all_ HttpClients in magic will be created using this name.
 
 However, the library is first and foremost created to support JSON and/or large files as payloads and response values,
 and the _"philosophy"_ of the library is to allow you to create HTTP REST requests with a _single line of code_, to

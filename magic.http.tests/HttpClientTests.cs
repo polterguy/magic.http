@@ -311,6 +311,7 @@ namespace magic.http.tests
             var services = new ServiceCollection();
             services.AddTransient<IConfiguration>((svc) => configuration);
             services.AddTransient<IHttpClient, HttpClient>();
+            services.AddHttpClient();
             var provider = services.BuildServiceProvider();
             return provider;
         }

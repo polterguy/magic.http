@@ -21,7 +21,7 @@ namespace magic.http.services
     /// </summary>
     public sealed class HttpClient : IHttpClient
     {
-        static readonly net.HttpClient _client = new net.HttpClient();
+        readonly net.HttpClient _client;
 
         // Default HTTP headers for an empty HTTP request.
         static readonly Dictionary<string, string> DEFAULT_HEADERS_EMPTY_REQUEST =
@@ -35,6 +35,15 @@ namespace magic.http.services
                 { "Content-Type", "application/json" },
                 { "Accept", "application/json" },
             };
+
+        /// <summary>
+        /// Creates a new instance of class.
+        /// </summary>
+        /// <param name="factory">The factory to create the internally kept HttpClient</param>
+        public HttpClient(net.IHttpClientFactory factory)
+        {
+            _client = factory.CreateClient("magic");
+        }
 
         #region [ -- Interface implementation -- ]
 
