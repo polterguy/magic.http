@@ -1,6 +1,6 @@
 /*
  * Magic, Copyright(c) Thomas Hansen 2019 - 2020, thomas@servergardens.com, all rights reserved.
- * Permission to use under the terms of the MIT license is hereby granted, see
+ * Permission to use under the terms of the LGPL license is hereby granted, see
  * the enclosed LICENSE file for details.
  */
 
