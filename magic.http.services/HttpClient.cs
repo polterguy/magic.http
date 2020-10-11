@@ -39,12 +39,12 @@ namespace magic.http.services
         #region [ -- Interface implementation -- ]
 
         /// <inheritdoc />
-        public async Task<Response<Response>> PostAsync<Request, Response>(
+        public async Task<Response<TOut>> PostAsync<TIn, TOut>(
             string url,
-            Request request,
+            TIn request,
             Dictionary<string, string> headers = null)
         {
-            return await CreateContentRequest<Response>(
+            return await CreateContentRequest<TOut>(
                 url,
                 net.HttpMethod.Post,
                 request,
@@ -52,12 +52,12 @@ namespace magic.http.services
         }
 
         /// <inheritdoc />
-        public async Task<Response<Response>> PostAsync<Request, Response>(
+        public async Task<Response<TOut>> PostAsync<TIn, TOut>(
             string url,
-            Request request,
+            TIn request,
             string token)
         {
-            return await CreateContentRequest<Response>(
+            return await CreateContentRequest<TOut>(
                 url,
                 net.HttpMethod.Post,
                 request,
@@ -65,12 +65,12 @@ namespace magic.http.services
         }
 
         /// <inheritdoc />
-        public async Task<Response<Response>> PutAsync<Request, Response>(
+        public async Task<Response<TOut>> PutAsync<TIn, TOut>(
             string url,
-            Request request,
+            TIn request,
             Dictionary<string, string> headers = null)
         {
-            return await CreateContentRequest<Response>(
+            return await CreateContentRequest<TOut>(
                 url,
                 net.HttpMethod.Put,
                 request,
@@ -78,12 +78,12 @@ namespace magic.http.services
         }
 
         /// <inheritdoc />
-        public async Task<Response<Response>> PutAsync<Request, Response>(
+        public async Task<Response<TOut>> PutAsync<TIn, TOut>(
             string url,
-            Request request,
+            TIn request,
             string token)
         {
-            return await CreateContentRequest<Response>(
+            return await CreateContentRequest<TOut>(
                 url,
                 net.HttpMethod.Put,
                 request,
@@ -91,22 +91,22 @@ namespace magic.http.services
         }
 
         /// <inheritdoc />
-        public async Task<Response<Response>> GetAsync<Response>(
+        public async Task<Response<TOut>> GetAsync<TOut>(
             string url,
             Dictionary<string, string> headers = null)
         {
-            return await CreateEmptyRequest<Response>(
+            return await CreateEmptyRequest<TOut>(
                 url,
                 net.HttpMethod.Get,
                 headers ?? DEFAULT_HEADERS_EMPTY_REQUEST);
         }
 
         /// <inheritdoc />
-        public async Task<Response<Response>> GetAsync<Response>(
+        public async Task<Response<TOut>> GetAsync<TOut>(
             string url,
             string token)
         {
-            return await CreateEmptyRequest<Response>(
+            return await CreateEmptyRequest<TOut>(
                 url,
                 net.HttpMethod.Get,
                 GetDefaultBearerTokenHeaders(token));
@@ -139,22 +139,22 @@ namespace magic.http.services
         }
 
         /// <inheritdoc />
-        public async Task<Response<Response>> DeleteAsync<Response>(
+        public async Task<Response<TOut>> DeleteAsync<TOut>(
             string url,
             Dictionary<string, string> headers = null)
         {
-            return await CreateEmptyRequest<Response>(
+            return await CreateEmptyRequest<TOut>(
                 url,
                 net.HttpMethod.Delete,
                 headers ?? DEFAULT_HEADERS_EMPTY_REQUEST);
         }
 
         /// <inheritdoc />
-        public async Task<Response<Response>> DeleteAsync<Response>(
+        public async Task<Response<TOut>> DeleteAsync<TOut>(
             string url,
             string token)
         {
-            return await CreateEmptyRequest<Response>(
+            return await CreateEmptyRequest<TOut>(
                 url,
                 net.HttpMethod.Delete,
                 GetDefaultBearerTokenHeaders(token));
@@ -168,21 +168,21 @@ namespace magic.http.services
          * during GET and DELETE requests, since you cannot apply a payload to
          * your request.
          */
-        async Task<Response<Response>> CreateEmptyRequest<Response>(
+        async Task<Response<TOut>> CreateEmptyRequest<TOut>(
             string url,
             net.HttpMethod method,
             Dictionary<string, string> headers)
         {
             using (var msg = CreateRequestMessage(method, url, headers))
             {
-                return await GetResult<Response>(msg);
+                return await GetResult<TOut>(msg);
             }
         }
 
         /* Responsible for creating a request of the specified type. Used
          * only during POST and PUT since it requires a payload to be provided.
          */
-        async Task<Response<Response>> CreateContentRequest<Response>(
+        async Task<Response<TOut>> CreateContentRequest<TOut>(
             string url,
             net.HttpMethod method,
             object input,
@@ -196,7 +196,7 @@ namespace magic.http.services
                     {
                         AddContentHeaders(content, headers);
                         msg.Content = content;
-                        return await GetResult<Response>(msg);
+                        return await GetResult<TOut>(msg);
                     }
                 }
 
@@ -208,7 +208,7 @@ namespace magic.http.services
                 {
                     AddContentHeaders(content, headers);
                     msg.Content = content;
-                    return await GetResult<Response>(msg);
+                    return await GetResult<TOut>(msg);
                 }
             }
         }
@@ -242,7 +242,7 @@ namespace magic.http.services
         /* Responsible for sending and retrieving your HTTP request and response.
          * Only invoked if you are requesting a non Stream result.
          */
-        async Task<Response<Response>> GetResult<Response>(
+        async Task<Response<TOut>> GetResult<TOut>(
             net.HttpRequestMessage msg)
         {
             using (var response = await _client.SendAsync(msg))
@@ -258,7 +258,7 @@ namespace magic.http.services
                     // Checking is request was successful, and if not, throwing an exception.
                     if (!response.IsSuccessStatusCode)
                     {
-                        var responseResult = new Response<Response>
+                        var responseResult = new Response<TOut>
                         {
                             Error = responseContent,
                             Status = response.StatusCode,
@@ -268,18 +268,18 @@ namespace magic.http.services
                     }
                     else
                     {
-                        var responseResult = new Response<Response>
+                        var responseResult = new Response<TOut>
                         {
                             Status = response.StatusCode,
                             Headers = responseHeaders,
                         };
 
                         // Checking if caller wants a string type of return
-                        if (typeof(Response) == typeof(string))
+                        if (typeof(TOut) == typeof(string))
                         {
-                            responseResult.Content = (Response)(object)responseContent;
+                            responseResult.Content = (TOut)(object)responseContent;
                         }
-                        else if (typeof(IConvertible).IsAssignableFrom(typeof(Response)))
+                        else if (typeof(IConvertible).IsAssignableFrom(typeof(TOut)))
                         {
                             /*
                              * Checking if Response type implements IConvertible, at which point
@@ -290,7 +290,7 @@ namespace magic.http.services
                              * an integer, or some other object that has automatic conversion
                              * from string to its own type.
                              */
-                            responseResult.Content = (Response)Convert.ChangeType(responseContent, typeof(Response));
+                            responseResult.Content = (TOut)Convert.ChangeType(responseContent, typeof(TOut));
                         }
                         else
                         {
@@ -301,14 +301,14 @@ namespace magic.http.services
                              * the above object immediately as such.
                              */
                             var objResult = JToken.Parse(responseContent);
-                            if (typeof(Response) == typeof(JContainer))
-                                responseResult.Content = (Response)(object)objResult;
+                            if (typeof(TOut) == typeof(JContainer))
+                                responseResult.Content = (TOut)(object)objResult;
 
                             /*
                              * Converting above JContainer to instance of requested type,
                              * and returns object to caller.
                              */
-                            responseResult.Content = objResult.ToObject<Response>();
+                            responseResult.Content = objResult.ToObject<TOut>();
                         }
 
                         // Finally, we can return result to caller.

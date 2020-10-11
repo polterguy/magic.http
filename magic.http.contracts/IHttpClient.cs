@@ -26,15 +26,15 @@ namespace magic.http.contracts
         /// and the service will intelligently determine it's a stream, and serialize it directly on to the HTTP
         /// request stream.
         /// </summary>
-        /// <typeparam name="Request">Type of request.</typeparam>
-        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <typeparam name="TIn">Type of request.</typeparam>
+        /// <typeparam name="TOut">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response<Response>> PostAsync<Request, Response>(
+        Task<Response<TOut>> PostAsync<TIn, TOut>(
             string url,
-            Request request,
+            TIn request,
             Dictionary<string, string> headers = null);
 
         /// <summary>
@@ -42,15 +42,15 @@ namespace magic.http.contracts
         /// Notice, you can supply a Stream as your request, and the service will intelligently
         /// determine it's a stream, and serialize it directly on to the HTTP request stream.
         /// </summary>
-        /// <typeparam name="Request">Type of request.</typeparam>
-        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <typeparam name="TIn">Type of request.</typeparam>
+        /// <typeparam name="TOut">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response<Response>> PostAsync<Request, Response>(
+        Task<Response<TOut>> PostAsync<TIn, TOut>(
             string url,
-            Request request,
+            TIn request,
             string token);
 
         /// <summary>
@@ -58,15 +58,15 @@ namespace magic.http.contracts
         /// and the service will intelligently determine it's a stream, and serialize it directly on to the HTTP
         /// request stream.
         /// </summary>
-        /// <typeparam name="Request">Type of request.</typeparam>
-        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <typeparam name="TIn">Type of request.</typeparam>
+        /// <typeparam name="TOut">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response<Response>> PutAsync<Request, Response>(
+        Task<Response<TOut>> PutAsync<TIn, TOut>(
             string url,
-            Request request,
+            TIn request,
             Dictionary<string, string> headers = null);
 
         /// <summary>
@@ -74,36 +74,36 @@ namespace magic.http.contracts
         /// Notice, you can supply a Stream as your request, and the service will intelligently
         /// determine it's a stream, and serialize it directly on to the HTTP request stream.
         /// </summary>
-        /// <typeparam name="Request">Type of request.</typeparam>
-        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <typeparam name="TIn">Type of request.</typeparam>
+        /// <typeparam name="TOut">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="request">Payload of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response<Response>> PutAsync<Request, Response>(
+        Task<Response<TOut>> PutAsync<TIn, TOut>(
             string url,
-            Request request,
+            TIn request,
             string token);
 
         /// <summary>
         /// Gets a resource from some URL.
         /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <typeparam name="TOut">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response<Response>> GetAsync<Response>(
+        Task<Response<TOut>> GetAsync<TOut>(
             string url,
             Dictionary<string, string> headers = null);
 
         /// <summary>
         /// Gets a resource from some URL with the specified Bearer token.
         /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <typeparam name="TOut">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Object returned from your request.</returns>
-        Task<Response<Response>> GetAsync<Response>(
+        Task<Response<TOut>> GetAsync<TOut>(
             string url,
             string token);
 
@@ -141,22 +141,22 @@ namespace magic.http.contracts
         /// <summary>
         /// Deletes some resource.
         /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <typeparam name="TOut">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="headers">HTTP headers for your request.</param>
         /// <returns>Result of your request.</returns>
-        Task<Response<Response>> DeleteAsync<Response>(
+        Task<Response<TOut>> DeleteAsync<TOut>(
             string url,
             Dictionary<string, string> headers = null);
 
         /// <summary>
         /// Deletes some resource with the specified Bearer token.
         /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
+        /// <typeparam name="TOut">Type of response.</typeparam>
         /// <param name="url">URL of your request.</param>
         /// <param name="token">Bearer token for your request.</param>
         /// <returns>Result of your request.</returns>
-        Task<Response<Response>> DeleteAsync<Response>(
+        Task<Response<TOut>> DeleteAsync<TOut>(
             string url,
             string token);
     }
