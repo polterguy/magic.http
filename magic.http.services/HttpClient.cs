@@ -7,12 +7,11 @@
 using System;
 using System.IO;
 using System.Net;
+using net = System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using net = System.Net.Http;
 using Newtonsoft.Json.Linq;
 using magic.http.contracts;
-using System.Net.Http.Headers;
 
 namespace magic.http.services
 {
@@ -20,10 +19,9 @@ namespace magic.http.services
     /// Service implementation for IHttpClient. Uses System.Net.Http.HttpClient
     /// internally to invoke your HTTP requests.
     /// </summary>
-    public class HttpClient : IHttpClient
+    public sealed class HttpClient : IHttpClient
     {
-        static readonly Lazy<net.HttpClient> _client = new Lazy<net.HttpClient>(() => new net.HttpClient());
-        readonly Func<string, net.HttpClient> _factory = (url) => _client.Value;
+        static readonly net.HttpClient _client = new net.HttpClient();
 
         // Default HTTP headers for an empty HTTP request.
         static readonly Dictionary<string, string> DEFAULT_HEADERS_EMPTY_REQUEST =
@@ -38,37 +36,9 @@ namespace magic.http.services
                 { "Accept", "application/json" },
             };
 
-        /// <summary>
-        /// Creates a new instance of your HttpClient without logging, using a
-        /// static single .Net HttpClient.
-        /// </summary>
-        public HttpClient()
-        { }
-
-        /// <summary>
-        /// Creates a new instance of your HttpClient with the specified HttpClient
-        /// factory function and no logging.
-        /// </summary>
-        /// <param name="factory"></param>
-        public HttpClient(Func<string, net.HttpClient> factory)
-        {
-            _factory = factory;
-        }
-
         #region [ -- Interface implementation -- ]
 
-        /// <summary>
-        /// Posts an object asynchronously to the specified URL. Notice, you can
-        /// supply a Stream as your request, and the service will intelligently
-        /// determine it's a stream, and serialize it directly on to the HTTP
-        /// request stream.
-        /// </summary>
-        /// <typeparam name="Request">Type of request.</typeparam>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="request">Payload of your request.</param>
-        /// <param name="headers">HTTP headers for your request.</param>
-        /// <returns>Object returned from your request.</returns>
+        /// <inheritdoc />
         public async Task<Response<Response>> PostAsync<Request, Response>(
             string url,
             Request request,
@@ -81,17 +51,7 @@ namespace magic.http.services
                 headers ?? DEFAULT_HEADERS_REQUEST);
         }
 
-        /// <summary>
-        /// Posts an object asynchronously to the specified URL with the specified Bearer token.
-        /// Notice, you can supply a Stream as your request, and the service will intelligently
-        /// determine it's a stream, and serialize it directly on to the HTTP request stream.
-        /// </summary>
-        /// <typeparam name="Request">Type of request.</typeparam>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="request">Payload of your request.</param>
-        /// <param name="token">Bearer token for your request.</param>
-        /// <returns>Object returned from your request.</returns>
+        /// <inheritdoc />
         public async Task<Response<Response>> PostAsync<Request, Response>(
             string url,
             Request request,
@@ -104,18 +64,7 @@ namespace magic.http.services
                 GetDefaultBearerTokenHeaders(token));
         }
 
-        /// <summary>
-        /// Puts an object asynchronously to the specified URL. Notice, you can
-        /// supply a Stream as your request, and the service will intelligently
-        /// determine it's a stream, and serialize it directly on to the HTTP
-        /// request stream.
-        /// </summary>
-        /// <typeparam name="Request">Type of request.</typeparam>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="request">Payload of your request.</param>
-        /// <param name="headers">HTTP headers for your request.</param>
-        /// <returns>Object returned from your request.</returns>
+        /// <inheritdoc />
         public async Task<Response<Response>> PutAsync<Request, Response>(
             string url,
             Request request,
@@ -128,17 +77,7 @@ namespace magic.http.services
                 headers ?? DEFAULT_HEADERS_REQUEST);
         }
 
-        /// <summary>
-        /// Puts an object asynchronously to the specified URL with the specified Bearer token.
-        /// Notice, you can supply a Stream as your request, and the service will intelligently
-        /// determine it's a stream, and serialize it directly on to the HTTP request stream.
-        /// </summary>
-        /// <typeparam name="Request">Type of request.</typeparam>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="request">Payload of your request.</param>
-        /// <param name="token">Bearer token for your request.</param>
-        /// <returns>Object returned from your request.</returns>
+        /// <inheritdoc />
         public async Task<Response<Response>> PutAsync<Request, Response>(
             string url,
             Request request,
@@ -151,13 +90,7 @@ namespace magic.http.services
                 GetDefaultBearerTokenHeaders(token));
         }
 
-        /// <summary>
-        /// Gets a resource from some URL.
-        /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="headers">HTTP headers for your request.</param>
-        /// <returns>Object returned from your request.</returns>
+        /// <inheritdoc />
         public async Task<Response<Response>> GetAsync<Response>(
             string url,
             Dictionary<string, string> headers = null)
@@ -168,13 +101,7 @@ namespace magic.http.services
                 headers ?? DEFAULT_HEADERS_EMPTY_REQUEST);
         }
 
-        /// <summary>
-        /// Gets a resource from some URL with the specified Bearer token.
-        /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="token">Bearer token for your request.</param>
-        /// <returns>Object returned from your request.</returns>
+        /// <inheritdoc />
         public async Task<Response<Response>> GetAsync<Response>(
             string url,
             string token)
@@ -185,15 +112,7 @@ namespace magic.http.services
                 GetDefaultBearerTokenHeaders(token));
         }
 
-        /// <summary>
-        /// Gets a resource from some URL. Notice, this overload requires you to supply
-        /// an Action taking a Stream as its input, from where you can directly access the response content,
-        /// without having to load it into memory. This i suseful for downloading larger documents from some URL.
-        /// </summary>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="functor">Action lambda function given the response Stream for you to do whatever you wish with once the request returns.</param>
-        /// <param name="headers">HTTP headers for your request.</param>
-        /// <returns>Async void Task</returns>
+        /// <inheritdoc />
         public async Task GetAsync(
             string url,
             Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
@@ -206,17 +125,7 @@ namespace magic.http.services
                 headers ?? DEFAULT_HEADERS_EMPTY_REQUEST);
         }
 
-        /// <summary>
-        /// Gets a resource from some URL with the specified Bearer token.
-        /// Notice, this overload requires you to supply an Action taking a Stream
-        /// as its input, from where you can directly access the response content,
-        /// without having to load it into memory. This i suseful for downloading
-        /// larger documents from some URL.
-        /// </summary>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="functor">Action lambda function given the response Stream for you to do whatever you wish with once the request returns.</param>
-        /// <param name="token">Bearer token for your request.</param>
-        /// <returns>Async void Task</returns>
+        /// <inheritdoc />
         public async Task GetAsync(
             string url,
             Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
@@ -229,13 +138,7 @@ namespace magic.http.services
                 GetDefaultBearerTokenHeaders(token));
         }
 
-        /// <summary>
-        /// Deletes some resource.
-        /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="headers">HTTP headers for your request.</param>
-        /// <returns>Result of your request.</returns>
+        /// <inheritdoc />
         public async Task<Response<Response>> DeleteAsync<Response>(
             string url,
             Dictionary<string, string> headers = null)
@@ -246,13 +149,7 @@ namespace magic.http.services
                 headers ?? DEFAULT_HEADERS_EMPTY_REQUEST);
         }
 
-        /// <summary>
-        /// Deletes some resource with the specified Bearer token.
-        /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="token">Bearer token for your request.</param>
-        /// <returns>Result of your request.</returns>
+        /// <inheritdoc />
         public async Task<Response<Response>> DeleteAsync<Response>(
             string url,
             string token)
@@ -265,19 +162,13 @@ namespace magic.http.services
 
         #endregion
 
-        #region [ -- Protected virtual methods -- ]
+        #region [ -- Private helper methods -- ]
 
-        /// <summary>
-        /// Responsible for creating an HTTP request of specified type. Only used
-        /// during GET and DELETE requests, since you cannot apply a payload to
-        /// your request.
-        /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="method">HTTP method or verb to create your request as.</param>
-        /// <param name="headers">HTTP headers for your request.</param>
-        /// <returns>Object returned from your request.</returns>
-        virtual protected async Task<Response<Response>> CreateEmptyRequest<Response>(
+        /* Responsible for creating an HTTP request of specified type. Only used
+         * during GET and DELETE requests, since you cannot apply a payload to
+         * your request.
+         */
+        async Task<Response<Response>> CreateEmptyRequest<Response>(
             string url,
             net.HttpMethod method,
             Dictionary<string, string> headers)
@@ -288,17 +179,10 @@ namespace magic.http.services
             }
         }
 
-        /// <summary>
-        /// Responsible for creating a request of the specified type. Used
-        /// only during POST and PUT since it requires a payload to be provided.
-        /// </summary>
-        /// <typeparam name="Response">Type of response.</typeparam>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="method">HTTP method or verb to create your request as.</param>
-        /// <param name="input">Payload for your request.</param>
-        /// <param name="headers">HTTP headers for your request.</param>
-        /// <returns>Object returned from your request.</returns>
-        virtual protected async Task<Response<Response>> CreateContentRequest<Response>(
+        /* Responsible for creating a request of the specified type. Used
+         * only during POST and PUT since it requires a payload to be provided.
+         */
+        async Task<Response<Response>> CreateContentRequest<Response>(
             string url,
             net.HttpMethod method,
             object input,
@@ -329,18 +213,11 @@ namespace magic.http.services
             }
         }
 
-        /// <summary>
-        /// Responsible for creating requests of type GET where the caller wants
-        /// to directly access the HTTP response stream, instead of having a typed
-        /// callback returned to him.
-        /// </summary>
-        /// <param name="url">URL of your request.</param>
-        /// <param name="method">HTTP method or verb to create your request as.</param>
-        /// <param name="functor">Callback function that will be invoked with the response
-        /// stream when it is ready.</param>
-        /// <param name="headers">HTTP headers for your request.</param>
-        /// <returns>An async Task</returns>
-        virtual protected async Task CreateEmptyRequestStreamResponse(
+        /* Responsible for creating requests of type GET where the caller wants
+         * to directly access the HTTP response stream, instead of having a typed
+         * callback returned to him.
+         */
+        async Task CreateEmptyRequestStreamResponse(
             string url,
             net.HttpMethod method,
             Action<Stream, HttpStatusCode, Dictionary<string, string>> functor,
@@ -348,7 +225,7 @@ namespace magic.http.services
         {
             using (var msg = CreateRequestMessage(method, url, headers))
             {
-                using (var response = await _factory(url).SendAsync(msg))
+                using (var response = await _client.SendAsync(msg))
                 {
                     using (var content = response.Content)
                     {
@@ -362,19 +239,14 @@ namespace magic.http.services
             }
         }
 
-        /// <summary>
-        /// Responsible for sending and retrieving your HTTP request and response.
-        /// Only invoked if you are requesting a non Stream result.
-        /// </summary>
-        /// <typeparam name="Response">Response type from endpoint.</typeparam>
-        /// <param name="url">URL for your request.</param>
-        /// <param name="msg">HTTP request message.</param>
-        /// <returns>Object returned from your request.</returns>
-        virtual protected async Task<Response<Response>> GetResult<Response>(
+        /* Responsible for sending and retrieving your HTTP request and response.
+         * Only invoked if you are requesting a non Stream result.
+         */
+        async Task<Response<Response>> GetResult<Response>(
             string url,
             net.HttpRequestMessage msg)
         {
-            using (var response = await _factory(url).SendAsync(msg))
+            using (var response = await _client.SendAsync(msg))
             {
                 using (var content = response.Content)
                 {
@@ -417,7 +289,7 @@ namespace magic.http.services
                              *
                              * This might be used if caller is requesting for instance
                              * an integer, or some other object that has automatic conversion
-                             * from string to itself.
+                             * from string to its own type.
                              */
                             responseResult.Content = (Response)Convert.ChangeType(responseContent, typeof(Response));
                         }
@@ -446,10 +318,6 @@ namespace magic.http.services
                 }
             }
         }
-
-        #endregion
-
-        #region [ -- Private helper methods -- ]
 
         /*
          * Creates a new request message, and decorates it with the relevant
@@ -504,7 +372,9 @@ namespace magic.http.services
          * Decorates the HTTP content with the relevant HTTP headers from the
          * specified dictionary.
          */
-        void AddContentHeaders(net.HttpContent content, Dictionary<string, string> headers)
+        void AddContentHeaders(
+            net.HttpContent content,
+            Dictionary<string, string> headers)
         {
             foreach (var idx in headers.Keys)
             {
@@ -541,7 +411,9 @@ namespace magic.http.services
             };
         }
 
-        Dictionary<string, string> GetHeaders(net.HttpResponseMessage response, net.HttpContent content)
+        Dictionary<string, string> GetHeaders(
+            net.HttpResponseMessage response,
+            net.HttpContent content)
         {
             var headers = new Dictionary<string, string>();
             foreach (var idx in response.Headers)

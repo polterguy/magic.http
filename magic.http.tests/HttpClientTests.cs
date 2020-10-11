@@ -43,7 +43,7 @@ namespace magic.http.tests
         [Fact]
         public async Task GetStringWithFunc()
         {
-            var kernel = Initialize((url) => new net.HttpClient());
+            var kernel = Initialize();
             var client = kernel.GetService(typeof(IHttpClient)) as IHttpClient;
             string result = null;
             await client
@@ -306,15 +306,12 @@ namespace magic.http.tests
             public string Name { get; set; }
         }
 
-        IServiceProvider Initialize(Func<string, net.HttpClient> functor = null)
+        IServiceProvider Initialize()
         {
             var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
             services.AddTransient<IConfiguration>((svc) => configuration);
-            if (functor != null)
-                services.AddTransient<IHttpClient>(svc => new HttpClient(url => new net.HttpClient()));
-            else
-                services.AddTransient<IHttpClient, HttpClient>();
+            services.AddTransient<IHttpClient, HttpClient>();
             var provider = services.BuildServiceProvider();
             return provider;
         }
