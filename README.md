@@ -48,7 +48,7 @@ into memory.
 
 Apart from the above features, the library does not really give you much options, and is to be considered an _"opinionated"_
 HTTP REST library, and its purpose is not to support every possible configuration you can imagine, since its purpose
-is first and foremost to be dead simple to use, and force creation of better HTTP REST endpoint consumption and creation.
+is first and foremost to be dead simple to use, and force creation of better HTTP REST invocations.
 However, if you have that _"one feature request you simply must have"_, feel free to supply a request in the
 [issues](https://github.com/polterguy/magic.http/issues). If it makes the API more complex, I might not want to support
 it though.
