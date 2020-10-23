@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using magic.http.contracts;
+using System.Text;
 
 namespace magic.http.services
 {
@@ -69,6 +70,32 @@ namespace magic.http.services
             return await CreateContentRequest<TOut>(
                 url,
                 net.HttpMethod.Post,
+                request,
+                GetDefaultBearerTokenHeaders(token));
+        }
+
+        /// <inheritdoc />
+        public async Task<Response<TOut>> PatchAsync<TIn, TOut>(
+            string url,
+            TIn request,
+            Dictionary<string, string> headers = null)
+        {
+            return await CreateContentRequest<TOut>(
+                url,
+                new net.HttpMethod("PATCH"),
+                request,
+                headers ?? DEFAULT_HEADERS_REQUEST);
+        }
+
+        /// <inheritdoc />
+        public async Task<Response<TOut>> PatchAsync<TIn, TOut>(
+            string url,
+            TIn request,
+            string token)
+        {
+            return await CreateContentRequest<TOut>(
+                url,
+                new net.HttpMethod("PATCH"),
                 request,
                 GetDefaultBearerTokenHeaders(token));
         }
@@ -216,6 +243,15 @@ namespace magic.http.services
                         return await GetResult<TOut>(msg);
                     }
                 }
+                else if (input is byte[] bytes)
+                {
+                    using (var content = new net.ByteArrayContent(bytes))
+                    {
+                        AddContentHeaders(content, headers);
+                        msg.Content = content;
+                        return await GetResult<TOut>(msg);
+                    }
+                }
 
                 var stringContent = input is string strInput ?
                     strInput :
@@ -270,14 +306,14 @@ namespace magic.http.services
                     var responseHeaders = GetHeaders(response, content);
 
                     // Retrieving actual content.
-                    var responseContent = await content.ReadAsStringAsync();
+                    var byteArray = await content.ReadAsByteArrayAsync();
 
                     // Checking is request was successful, and if not, throwing an exception.
                     if (!response.IsSuccessStatusCode)
                     {
                         var responseResult = new Response<TOut>
                         {
-                            Error = responseContent,
+                            Error = Encoding.UTF8.GetString(byteArray),
                             Status = response.StatusCode,
                             Headers = responseHeaders,
                         };
@@ -291,10 +327,13 @@ namespace magic.http.services
                             Headers = responseHeaders,
                         };
 
-                        // Checking if caller wants a string type of return
-                        if (typeof(TOut) == typeof(string))
+                        if (typeof(TOut) == typeof(byte[]))
                         {
-                            responseResult.Content = (TOut)(object)responseContent;
+                            responseResult.Content = (TOut)(object)byteArray;
+                        }
+                        else if (typeof(TOut) == typeof(string))
+                        {
+                            responseResult.Content = (TOut)(object)Encoding.UTF8.GetString(byteArray);
                         }
                         else if (typeof(IConvertible).IsAssignableFrom(typeof(TOut)))
                         {
@@ -307,7 +346,9 @@ namespace magic.http.services
                              * an integer, or some other object that has automatic conversion
                              * from string to its own type.
                              */
-                            responseResult.Content = (TOut)Convert.ChangeType(responseContent, typeof(TOut));
+                            responseResult.Content = (TOut)Convert.ChangeType(
+                                Encoding.UTF8.GetString(byteArray),
+                                typeof(TOut));
                         }
                         else
                         {
@@ -317,7 +358,7 @@ namespace magic.http.services
                              * such as a JArray or JObject, at which point we simply return
                              * the above object immediately as such.
                              */
-                            var objResult = JToken.Parse(responseContent);
+                            var objResult = JToken.Parse(Encoding.UTF8.GetString(byteArray));
                             if (typeof(TOut) == typeof(JContainer))
                                 responseResult.Content = (TOut)(object)objResult;
 

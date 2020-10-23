@@ -54,6 +54,38 @@ namespace magic.http.contracts
             string token);
 
         /// <summary>
+        /// Patches an object asynchronously to the specified URL. Notice, you can supply a Stream as your request,
+        /// and the service will intelligently determine it's a stream, and serialize it directly on to the HTTP
+        /// request stream.
+        /// </summary>
+        /// <typeparam name="TIn">Type of request.</typeparam>
+        /// <typeparam name="TOut">Type of response.</typeparam>
+        /// <param name="url">URL of your request.</param>
+        /// <param name="request">Payload of your request.</param>
+        /// <param name="headers">HTTP headers for your request.</param>
+        /// <returns>Object returned from your request.</returns>
+        Task<Response<TOut>> PatchAsync<TIn, TOut>(
+            string url,
+            TIn request,
+            Dictionary<string, string> headers = null);
+
+        /// <summary>
+        /// Patches an object asynchronously to the specified URL with the specified Bearer token.
+        /// Notice, you can supply a Stream as your request, and the service will intelligently
+        /// determine it's a stream, and serialize it directly on to the HTTP request stream.
+        /// </summary>
+        /// <typeparam name="TIn">Type of request.</typeparam>
+        /// <typeparam name="TOut">Type of response.</typeparam>
+        /// <param name="url">URL of your request.</param>
+        /// <param name="request">Payload of your request.</param>
+        /// <param name="token">Bearer token for your request.</param>
+        /// <returns>Object returned from your request.</returns>
+        Task<Response<TOut>> PatchAsync<TIn, TOut>(
+            string url,
+            TIn request,
+            string token);
+
+        /// <summary>
         /// Puts an object asynchronously to the specified URL. Notice, you can supply a Stream as your request,
         /// and the service will intelligently determine it's a stream, and serialize it directly on to the HTTP
         /// request stream.
