@@ -7,12 +7,12 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Text;
 using net = System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using magic.http.contracts;
-using System.Text;
 
 namespace magic.http.services
 {
