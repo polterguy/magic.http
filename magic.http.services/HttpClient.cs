@@ -326,9 +326,25 @@ namespace magic.http.services
                             Headers = responseHeaders,
                         };
 
-                        if (typeof(TOut) == typeof(byte[]))
+                        if (typeof(TOut) == typeof(byte[]) || typeof(TOut) == typeof(object))
                         {
-                            responseResult.Content = (TOut)(object)await content.ReadAsByteArrayAsync();
+                            var isTextResponse = false;
+                            var contentType = content.Headers.ContentType?.MediaType ?? "application/json";
+                            switch (contentType)
+                            {
+                                case "application/json":
+                                case "application/hyperlambda":
+                                    isTextResponse = true;
+                                    break;
+                                default:
+                                    if (contentType.StartsWith("text/"))
+                                        isTextResponse = true;
+                                    break;
+                            }
+                            if (isTextResponse)
+                                responseResult.Content = (TOut)(object)await content.ReadAsStringAsync();
+                            else
+                                responseResult.Content = (TOut)(object)await content.ReadAsByteArrayAsync();
                         }
                         else if (typeof(TOut) == typeof(string))
                         {
