@@ -10,7 +10,7 @@
     <Description>Contracts for magic.http that allows you to invoke an HTTP REST endpoint with a single line of code. To use package go to https://polterguy.github.io</Description>
     <PackageProjectUrl>https://github.com/polterguy/magic.http</PackageProjectUrl>
     <PackOnBuild>true</PackOnBuild>
-    <PackageVersion>8.6.9</PackageVersion>
+    <PackageVersion>8.9.0</PackageVersion>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/polterguy/magic.http.git</RepositoryUrl>
