@@ -294,8 +294,7 @@ namespace magic.http.services
         /* Responsible for sending and retrieving your HTTP request and response.
          * Only invoked if you are requesting a non Stream result.
          */
-        async Task<Response<TOut>> GetResult<TOut>(
-            net.HttpRequestMessage msg)
+        async Task<Response<TOut>> GetResult<TOut>(net.HttpRequestMessage msg)
         {
             using (var response = await _client.SendAsync(msg))
             {
