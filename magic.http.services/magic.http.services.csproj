@@ -6,7 +6,7 @@
     <PackageId>magic.http</PackageId>
     <Authors>Thomas Hansen</Authors>
     <Company>Thomas Hansen</Company>
-    <Copyright>Thomas Hansen, thomas@gaiasoul.com</Copyright>
+    <Copyright>Thomas Hansen, thomas@servergardens.com</Copyright>
     <Description>A minimalistic HTTP REST library, wrapping HttpClient, giving you strongly types, and method invocations, making HTTP REST invocations almost as easy as invoking local methods and functions, with a single line of code. To use package go to https://polterguy.github.io</Description>
     <PackageProjectUrl>https://github.com/polterguy/magic.http</PackageProjectUrl>
     <PackOnBuild>true</PackOnBuild>
@@ -35,14 +35,13 @@
 
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin/Release/netstandard2.0/magic.http.services.xml</DocumentationFile>
+    <DocumentationFile>bin/Release/netstandard2.0/magic.http.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
-
+ 
   <ItemGroup>
     <ProjectReference Include="..\magic.http.contracts\magic.http.contracts.csproj" />
   </ItemGroup>
