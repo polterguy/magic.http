@@ -105,3 +105,8 @@ You can read some of its rational below.
 - [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=security_rating)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
 - [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=sqale_index)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
 - [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
+
+## License
+
+This project is the copyright(c) 2020-2021 of Thomas Hansen thomas@servergardens.com, and is licensed under the terms
+of the LGPL version 3, as published by the Free Software Foundation. See the enclosed LICENSE file for details.
