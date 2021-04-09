@@ -92,6 +92,10 @@ You can read some of its rational below.
 1. [HttpClient is fundamentally broken](https://dzone.com/articles/nets-httpclient-is-a-hot-smoking-pile-of-garbage)
 2. [Salvaging HttpClient](https://dzone.com/articles/salvaging-nets-httpclient)
 
+## Project website
+
+The source code for this repository can be found at [github.com/polterguy/magic.http](https://github.com/polterguy/magic.http), and you can provide feedback, provide bug reports, etc at the same place.
+
 ## Quality gates
 
 - [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=polterguy_magic.http&metric=alert_status)](https://sonarcloud.io/dashboard?id=polterguy_magic.http)
