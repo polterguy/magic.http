@@ -291,7 +291,8 @@ namespace magic.http.services
             }
         }
 
-        /* Responsible for sending and retrieving your HTTP request and response.
+        /* 
+         * Responsible for sending and retrieving your HTTP request and response.
          * Only invoked if you are requesting a non Stream result.
          */
         async Task<Response<TOut>> GetResult<TOut>(net.HttpRequestMessage msg)
@@ -323,74 +324,54 @@ namespace magic.http.services
                             Status = response.StatusCode,
                             Headers = responseHeaders,
                         };
-
-                        if (typeof(TOut) == typeof(byte[]) || typeof(TOut) == typeof(object))
-                        {
-                            var isTextResponse = false;
-                            var contentType = content.Headers.ContentType?.MediaType ?? "application/json";
-                            switch (contentType)
-                            {
-                                case "application/json":
-                                case "application/hyperlambda":
-                                    isTextResponse = true;
-                                    break;
-                                default:
-                                    if (contentType.StartsWith("text/"))
-                                        isTextResponse = true;
-                                    break;
-                            }
-                            if (isTextResponse)
-                                responseResult.Content = (TOut)(object)await content.ReadAsStringAsync();
-                            else
-                                responseResult.Content = (TOut)(object)await content.ReadAsByteArrayAsync();
-                        }
-                        else if (typeof(TOut) == typeof(string))
-                        {
-                            responseResult.Content = (TOut)(object)await content.ReadAsStringAsync();
-                        }
-                        else if (typeof(IConvertible).IsAssignableFrom(typeof(TOut)))
-                        {
-                            /*
-                             * Checking if Response type implements IConvertible, at which point
-                             * we simply converts the response instead of parsing it using
-                             * JSON conversion.
-                             *
-                             * This might be used if caller is requesting for instance
-                             * an integer, or some other object that has automatic conversion
-                             * from string to its own type.
-                             */
-                            var txtContent = await content.ReadAsStringAsync();
-                            responseResult.Content = (TOut)Convert.ChangeType(txtContent, typeof(TOut));
-                        }
-                        else
-                        {
-                            /*
-                             * Anything but string, byte[], and/or an IConvertible object.
-                             * Hence, parsing content as JSON.
-                             */
-                            var txtContent = await content.ReadAsStringAsync();
-                            var objResult = JToken.Parse(txtContent);
-
-                            /*
-                             * Checking if caller is interested in some sort of JContainer,
-                             * such as a JArray or JObject, at which point we simply return
-                             * the above object immediately as such.
-                             */
-                            if (typeof(TOut) == typeof(JContainer))
-                                responseResult.Content = (TOut)(object)objResult;
-
-                            /*
-                             * Converting above JContainer to instance of requested type,
-                             * and returns object to caller.
-                             */
-                            responseResult.Content = objResult.ToObject<TOut>();
-                        }
-
-                        // Finally, we can return result to caller.
-                        return responseResult;
+                        return await GetSuccessResult<TOut>(content, responseResult);
                     }
                 }
             }
+        }
+
+        /*
+         * Responsible for creating a success result of some sort.
+         */
+        async Task<Response<TOut>> GetSuccessResult<TOut>(
+            net.HttpContent content,
+            Response<TOut> responseResult)
+        {
+            if (typeof(TOut) == typeof(byte[]) || typeof(TOut) == typeof(object))
+            {
+                var contentType = content.Headers.ContentType?.MediaType ?? "application/json";
+                switch (contentType)
+                {
+                    case "application/json":
+                    case "application/hyperlambda":
+                        responseResult.Content = (TOut)(object)await content.ReadAsStringAsync();
+                        break;
+
+                    default:
+                        if (contentType.StartsWith("text/"))
+                            responseResult.Content = (TOut)(object)await content.ReadAsStringAsync();
+                        else
+                            responseResult.Content = (TOut)(object)await content.ReadAsByteArrayAsync();
+                        break;
+                }
+            }
+            else if (typeof(TOut) == typeof(string))
+            {
+                responseResult.Content = (TOut)(object)await content.ReadAsStringAsync();
+            }
+            else if (typeof(IConvertible).IsAssignableFrom(typeof(TOut)))
+            {
+                var txtContent = await content.ReadAsStringAsync();
+                responseResult.Content = (TOut)Convert.ChangeType(txtContent, typeof(TOut));
+            }
+            else
+            {
+                var txtContent = await content.ReadAsStringAsync();
+                var objResult = JToken.Parse(txtContent);
+                responseResult.Content = objResult.ToObject<TOut>();
+            }
+
+            return responseResult;
         }
 
         /*
