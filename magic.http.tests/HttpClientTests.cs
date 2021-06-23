@@ -305,7 +305,7 @@ namespace magic.http.tests
             public string Name { get; set; }
         }
 
-        IServiceProvider Initialize()
+        static IServiceProvider Initialize()
         {
             var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
